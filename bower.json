@@ -1,9 +1,8 @@
 {
-  "name": "angular-seed",
-  "description": "A starter project for AngularJS",
+  "name": "Abouda",
+  "description": "Social Networking Portal",
   "version": "0.0.0",
-  "homepage": "https://github.com/angular/angular-seed",
-  "license": "MIT",
+  "homepage": "https://github.com/AnwarMohamed/Abouda",  
   "private": true,
   "dependencies": {
     "angular": "~1.4.0",
