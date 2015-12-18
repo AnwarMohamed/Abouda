@@ -1,5 +1,5 @@
 <?php
-require 'plugins/slim/Slim.php';
+require 'plugins/Slim/Slim.php';
 require 'users.php';
 
 \Slim\Slim::registerAutoloader();
