@@ -62,6 +62,14 @@ class Users
                 Users::ERROR_BIRTHDATE_FORMAT, $app);
         }   
 
+        
+        if($gender_filtered=="male"){
+            $gender_filtered=TRUE;
+        }
+        else{
+            $gender_filtered=FALSE;
+        }
+
         echo $fname_filtered .':'. $lname_filtered .':'. $email_filtered .':'. $password_filtered;
 
 

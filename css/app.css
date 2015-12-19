@@ -1,0 +1,71 @@
+@font-face {
+  font-family: Cabin;
+  src: url(/fonts/Cabin-Regular.otf) format("opentype");
+}
+
+@font-face {
+  font-family: Cabin;
+  font-weight: bold;
+  src: url(/fonts/Cabin-Bold.otf) format("opentype");
+}
+
+body {
+  font-family: 'Cabin', sans-serif;
+  background-color: #f5f8fa!important;
+}
+
+.navbar-default {
+  background-color: white;  
+  border-radius: 0px;
+  height: 46px;   
+}
+
+.navbar-nav li a {
+  line-height: 46px;
+  vertical-align: middle;
+}
+
+#global-actions > li > a {     
+  transition: all .15s ease-in-out;
+  border-bottom-style: solid;  
+  border-bottom-color: transparent;
+  height: 50px;
+  top: -5px;
+}
+
+#global-actions > li:hover >a {    
+  color: #337ab7;
+  border-bottom-color: #337ab7;  
+  border-bottom-width: 5px;    
+}
+
+#info-area {
+  margin-top: 0px;  
+  width: 100%;
+}
+
+#info-area > h3 {
+  margin-top: 10px;
+  margin-bottom: 0px;
+}
+
+#email-info-area {
+  margin-top: 0px;
+  color: gray;
+}
+
+#date-info-area {
+  color: black;
+  font-size: 12px;
+  font-family: "Helvetica Neue";
+}
+
+#photo-info-area {
+  border-radius: 5px;
+  border-image-width: 1;
+  background-color: white;
+  border: 5px solid white;
+  width: 200px;
+  height: 200px;
+}
+
