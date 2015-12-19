@@ -1,12 +1,10 @@
 <?php
-require 'plugins/Slim/Slim.php';
+require 'plugins/vendor/autoload.php';
 require 'users.php';
-
-\Slim\Slim::registerAutoloader();
 
 $debug_mode = true;
 
-$app = new \Slim\Slim();
+$app = new \Slim\App;
 $app->config('debug', $debug_mode);
 
 function parseJsonBody($app) {
