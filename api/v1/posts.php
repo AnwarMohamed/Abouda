@@ -4,7 +4,7 @@ class Posts
 {
 	static public function getPost($response, $token, $post_id)
 	{
-        if (!Database::checkToken($token)) {
+        if (!TokensDB::check($token)) {
             return putError(
                 'invalid token', 
                 Users::ERROR_AUTH_INVALID, $response);            

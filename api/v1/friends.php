@@ -1,10 +1,12 @@
 <?php
 
+require_once 'tokens_db.php';
+
 class Friends
 {
     static public function getBlocked($response, $token)
     {
-        if (!Database::checkToken($token)) {
+        if (!TokensDB::check($token)) {
             return putError(
                 'invalid token', 
                 Users::ERROR_AUTH_INVALID, $response);            
@@ -20,7 +22,7 @@ class Friends
 
     static public function getAccepted($response, $token, $friend_id)
     {
-        if (!Database::checkToken($token)) {
+        if (!TokensDB::check($token)) {
             return putError(
                 'invalid token', 
                 Users::ERROR_AUTH_INVALID, $response);            
@@ -36,7 +38,7 @@ class Friends
 
     static public function getRequested($response, $token)
     {
-        if (!Database::checkToken($token)) {
+        if (!TokensDB::check($token)) {
             return putError(
                 'invalid token', 
                 Users::ERROR_AUTH_INVALID, $response);            
@@ -52,7 +54,7 @@ class Friends
 
     static public function getWaiting($response, $token)
     {
-        if (!Database::checkToken($token)) {
+        if (!TokensDB::check($token)) {
             return putError(
                 'invalid token', 
                 Users::ERROR_AUTH_INVALID, $response);            

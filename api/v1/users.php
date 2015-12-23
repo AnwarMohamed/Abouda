@@ -1,7 +1,7 @@
 <?php
 
 require 'validator.php';
-require 'database.php';
+require 'users_db.php';
 
 class Users
 {
@@ -28,7 +28,7 @@ class Users
     const ERROR_EMAIL_DUPLICATE = 1210;
     const ERROR_AUTH_INVALID = 1211;
 
-    static public function newUser($response, $user)
+    static public function create($response, $user)
     {
         if (count($user) != 6) {
             return putError(
@@ -78,7 +78,7 @@ class Users
         $user[Users::GENDER_KEY] = ($user[Users::GENDER_KEY] == "male");
 
 
-        $duplicate = Database::checkEmail($user[Users::EMAIL_KEY]);
+        $duplicate = UsersDB::duplicate($user[Users::EMAIL_KEY]);
 
         if ($duplicate) {
             return putError(
@@ -86,7 +86,7 @@ class Users
                 Users::ERROR_EMAIL_DUPLICATE, $response);
         }
 
-        $user = Database::newUser($user);
+        $user = UsersDB::create($user);
 
         if (!$user) {
             return putError(
@@ -126,7 +126,7 @@ class Users
                 Users::ERROR_PASSWORD_FORMAT, $response);
         }
 
-        $creds = Database::authUser($creds);
+        $creds = UsersDB::auth($creds);
 
         if (!$creds) {
             return putError(
@@ -145,13 +145,13 @@ class Users
 
     static public function deleteMe($response, $token)
     {
-        if (!Database::checkToken($token)) {
+        if (!TokensDB::check($token)) {
             return putError(
                 'invalid token', 
                 Users::ERROR_AUTH_INVALID, $response);            
         }
 
-        $delete = Database::deleteUser($token[Users::ID_KEY]);
+        $delete = UsersDB::delete($token[Users::ID_KEY]);
 
         if (!$delete) {
             return putError(

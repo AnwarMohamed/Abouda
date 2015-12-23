@@ -1,5 +1,6 @@
 <?php
 require 'plugins/vendor/autoload.php';
+require 'database.php';
 require 'users.php';
 require 'posts.php';
 require 'friends.php';
@@ -100,7 +101,7 @@ function putError($body, $code, $response) {
 /* Handle new user */
 $app->post('/user/new', function ($request, $response) {
     $data = parseJsonBody($request);        
-    return Users::newUser($response, $data);
+    return Users::create($response, $data);
 });
 
 /* Handle authenticate user */
