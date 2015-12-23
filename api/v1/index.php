@@ -1,6 +1,7 @@
 <?php
 require 'plugins/vendor/autoload.php';
 require 'users.php';
+require 'posts.php';
 
 $debug_mode = false;
 
@@ -53,22 +54,22 @@ $container['notAllowedHandler'] = function ($container) {
 $app = new \Slim\App($container);
 $app->config('debug', $debug_mode);
 
-function parseToken($request) {
-    if (!$request->headers)
-        return false;
+function parseToken($request) {    
+    if (!$request)
+        return false;        
 
-    if (!isset($request->headers['Abouda-Token']))
+    if (!$request->getHeaderLine('Abouda-Token'))
         return false;
-
-    $token = base64_decode($request->headers['Abouda-Token']);
+    
+    $token = base64_decode($request->getHeaderLine('Abouda-Token'));        
     $token = explode(":", $token);
 
     if (count($token) != 2)
         return false;
 
     $token = array(
-        Users::ID_KEY  => $token[0],
-        Users::TOKEN_KEY => $token[1],
+        Users::ID_KEY  => trim($token[0]),
+        Users::TOKEN_KEY => trim($token[1]),
         Users::REMOTE_ADDR_KEY => $_SERVER['REMOTE_ADDR']
     );
 
@@ -104,38 +105,41 @@ $app->post('/user/new', function ($request, $response) {
 /* Handle authenticate user */
 $app->post('/user/', function ($request, $response) {    
     $data = parseJsonBody($request);    
-    return Users::authenticate($response, $data);
+    return Users::authUser($response, $data);
 });
 
 /* Handle delete current user */
 $app->delete('/user/me', function ($request, $response) {
-    $token = parseToken($request);
+    $token = parseToken($request);    
     return Users::deleteMe($response, $token);
 });
 
-/* Handle get current user */
-$app->get('/user/me', function ($request, $response) {
-    return Users::getMe($response);
-});
 
+/* Handle get post */
+$app->get('/post/{id}', function ($request, $response, $args) {
+    $token = parseToken($request);
+    $post_id = $args['id'];
+    return Posts::getPost($response, $token, $post_id);
+});
 
 
 /* Handle update current user */
 $app->put('/user/me', function ($request, $response) {
-    if (!$app->request) {
-        putError(
-            'invalid post request', 
-            ERROR_REQUEST_INVALID, $app);
-    }
-
-    $data = parseJsonBody($app);
-    return Users::updateMe($app, $data);
+    $token = parseToken($request);
+    $data = parseJsonBody($request);
+    return Users::updateMe($response, $token, $data);
 });
 
+/* Handle get current user */
+$app->get('/user/me', function ($request, $response) {
+    $token = parseToken($request);    
+    return Users::getMe($response, $token);
+});
 
 /* Handle existing user */
-$app->get('/user/:id', function ($request, $response, $args) {        
-    return Users::getUser($app, $id);
+$app->get('/user/:id', function ($request, $response, $args) { 
+    $token = parseToken($request);        
+    return Users::getUser($response, $token, $id);
 });
 
 $app->run();

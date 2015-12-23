@@ -1,242 +1,334 @@
 <?php
 
-//error_reporting(E_ALL);
-//ini_set('display_errors', 1);
-
 class Database
 {
-	const ERROR_DATABASE_CONN = 1220;
-	const ERROR_DATABASE_LOGIC = 1221;
+    const ERROR_DATABASE_CONN = 1220;    
 
-	static public function getConection() 
-	{
-		$mysqli = new mysqli("localhost", "root", "root", "abouda");
-		return $mysqli->connect_errno ? false: $mysqli;
-	}
+    static public function getConection() 
+    {
+        $mysqli = new mysqli("localhost", "root", "root", "abouda");
+        return $mysqli->connect_errno ? false: $mysqli;
+    }
 
-	static public function checkEmail($mysqli, $email) 
-	{
-		$query_sql = "SELECT COUNT(user_email) 
-					  FROM users 
-					  WHERE user_email = ?";
+    static public function checkEmail($email) 
+    {
+        if (!($mysqli = Database::getConection()))
+            return false;
 
-		$query = $mysqli->prepare($query_sql);			
-		$query->bind_param('s', $email);		
-		$query->execute();
-		$query-> bind_result($count);
+        $query_sql = "SELECT 
+                            COUNT(user_email) 
+                      FROM 
+                            users 
+                      WHERE 
+                            user_email = ?";
 
-		while ($query-> fetch()) { break;}
+        $query = $mysqli->prepare($query_sql);          
+        $query->bind_param('s', $email);        
+        $query->execute();
+        $query-> bind_result($count);
 
-		$query->close();		
+        while ($query-> fetch()) { break;}
 
-		return $count != 0;
-	}
+        $query->close(); 
+        $mysqli->close();       
 
-	static public function newUser($response, $user) 
-	{
-		if (!($mysqli = Database::getConection())) {
-			return putError(
-				'database connection error', 
-				DATABASE::ERROR_DATABASE_CONN, $response);			
-		}		
+        return $count != 0;
+    }
 
-		if (Database::checkEmail($mysqli , $user[Users::EMAIL_KEY])) {
-			return putError(
-				'duplicate email parameter', 
-				Users::ERROR_EMAIL_DUPLICATE, $response);
-		}
+    static public function newUser($user) 
+    {
+        if (!($mysqli = Database::getConection()))
+            return false;
 
-		$mysqli->autocommit(FALSE);
+        $mysqli->autocommit(FALSE);
 
-		$query_sql = "INSERT INTO users 
-					  VALUES (default,?,SHA1(?))";
+        $query_sql = "INSERT INTO users 
+                      VALUES (default,?,SHA1(?))";
 
-		$query = $mysqli->prepare($query_sql);				
-		$query->bind_param("ss", 
-			$user[Users::EMAIL_KEY], 
-			$user[Users::PASSWORD_KEY]);
-		
-		$query->execute();
-		$query->close();
+        $query = $mysqli->prepare($query_sql);              
+        $query->bind_param("ss", 
+            $user[Users::EMAIL_KEY], 
+            $user[Users::PASSWORD_KEY]);
+        
+        $query->execute();
+        $query->close();
 
-		$user[Users::ID_KEY] = strval($mysqli->insert_id);
+        $user[Users::ID_KEY] = strval($mysqli->insert_id);
 
-		$query_sql = "INSERT INTO users_info (user_id, user_fname, user_lname, user_gender, user_birthdate) 
-					  VALUES (?,?,?,?,?)";
+        $query_sql = "INSERT INTO 
+                            users_info 
+                            (user_id, 
+                                user_fname, 
+                                user_lname, 
+                                user_gender, 
+                                user_birthdate) 
+                      VALUES 
+                            (?,?,?,?,?)";
 
-		$query = $mysqli->prepare($query_sql);				
-		$query->bind_param("sssss", 
-			$user[Users::ID_KEY],
-			$user[Users::FNAME_KEY],
-			$user[Users::LNAME_KEY],
-			$user[Users::GENDER_KEY],
-			$user[Users::BIRTHDATE_KEY]);
+        $query = $mysqli->prepare($query_sql);              
+        $query->bind_param("sssss", 
+            $user[Users::ID_KEY],
+            $user[Users::FNAME_KEY],
+            $user[Users::LNAME_KEY],
+            $user[Users::GENDER_KEY],
+            $user[Users::BIRTHDATE_KEY]);
 
-		$query->close();
+        $query->close();
 
-		$user = Database::generateToken($mysqli, $user);
+        $user = Database::newToken($mysqli, $user);
 
-		$mysqli->commit();
-		$mysqli->close();		
+        $mysqli->commit();
+        $mysqli->close();       
 
-	    return putJsonBody(array(
-	        'error' => false,
-	        'error_code' => 0,
-	        'msg'   => 'new user created',
-	        'result' => array(
-	        	'user_id' => $user[Users::ID_KEY],
-	        	'token' => $user[Users::TOKEN_KEY],
-	        )
-	    ), 200, $response);  		
-	}
+        return $user;        
+    }
 
-	static public function generateToken($mysqli, $user) {
-		$user[Users::TOKEN_KEY] = sha1(strval(time())
-			.$user[Users::REMOTE_ADDR_KEY]
-			.$user[Users::ID_KEY]);
+    static public function newToken($mysqli, $user) {
+        $user[Users::TOKEN_KEY] = sha1(strval(time())
+            .$user[Users::REMOTE_ADDR_KEY]
+            .$user[Users::ID_KEY]);
 
-		$query_sql = "INSERT INTO tokens
-					  VALUES (?,?,NOW(),?)
-					  ON DUPLICATE KEY
-					  UPDATE user_token=?, token_timestamp=NOW(), token_address=?;";				  
+        $query_sql = "INSERT INTO 
+                            tokens
+                      VALUES 
+                            (?,?,NOW(),?)
+                      ON 
+                            DUPLICATE KEY
+                      UPDATE 
+                            user_token=?, 
+                            token_timestamp=NOW(), 
+                            token_address=?;";                
 
-		$query = $mysqli->prepare($query_sql);		
-		$query->bind_param("sssss", 
-			$user[Users::ID_KEY],
-			$user[Users::TOKEN_KEY],
-			$user[Users::REMOTE_ADDR_KEY],
-			$user[Users::TOKEN_KEY],
-			$user[Users::REMOTE_ADDR_KEY]);
+        $query = $mysqli->prepare($query_sql);      
+        $query->bind_param("sssss", 
+            $user[Users::ID_KEY],
+            $user[Users::TOKEN_KEY],
+            $user[Users::REMOTE_ADDR_KEY],
+            $user[Users::TOKEN_KEY],
+            $user[Users::REMOTE_ADDR_KEY]);
 
-		$query->execute();
-		$query->close();	
+        $query->execute();
+        $query->close();    
 
-		return $user;	
-	}
+        return $user;   
+    }
 
-	static public function authenticate($response, $user)
-	{
-		if (!($mysqli = Database::getConection())) {
-			return putError(
-				'database connection error', 
-				DATABASE::ERROR_DATABASE_CONN, $response);			
-		}
+    static public function authUser($user)
+    {
+        if (!($mysqli = Database::getConection()))
+            return false;                  
 
-		$query_sql = "SELECT user_id from users 
-					  WHERE user_email = ? AND user_password = SHA1(?)";
+        $query_sql = "SELECT 
+                            user_id 
+                      FROM 
+                            users 
+                      WHERE 
+                            user_email = ? AND 
+                            user_password = SHA1(?)";
 
-		$query = $mysqli->prepare($query_sql);				
-		$query->bind_param("ss", 
-			$user[Users::EMAIL_KEY], 
-			$user[Users::PASSWORD_KEY]);
-		
-		$query->execute();
-		$query->store_result();
+        $query = $mysqli->prepare($query_sql);              
+        $query->bind_param("ss", 
+            $user[Users::EMAIL_KEY], 
+            $user[Users::PASSWORD_KEY]);
+        
+        $query->execute();
+        $query->store_result();
 
-		if ($query->num_rows == 1) {
+        if ($query->num_rows == 1) {
 
-			$query->bind_result($user_id);			
-			$query->fetch();
-			$query->close();			
+            $query->bind_result($user_id);          
+            $query->fetch();
+            $query->close();            
 
-			$user[Users::ID_KEY] = $user_id;
-			$user = Database::generateToken($mysqli, $user);
-			$mysqli->close();
+            $user[Users::ID_KEY] = $user_id;
+            $user = Database::newToken($mysqli, $user);
+            $mysqli->close();
 
-		    return putJsonBody(array(
-		        'error' => false,
-		        'error_code' => 0,
-		        'msg'   => 'user authenticated',
-		        'result' => array(
-		        	'user_id' => $user[Users::ID_KEY],
-		        	'token' => $user[Users::TOKEN_KEY],
-		        )
-		    ), 200, $response); 			
+            return $user;           
+        } 
+            
+        $query->free_result();
+        $query->close();
+        $mysqli->close();           
+        
+        return false;     
+    }
 
-		} else if ($query->num_rows == 0) {
+    static public function checkToken($mysqli, $token) {
+        if (!($mysqli = Database::getConection()))
+            return false;       
 
-			$query->free_result();
-			$query->close();
-			$mysqli->close();
+        $query_sql = "SELECT 
+                            user_id
+                      FROM 
+                            tokens
+                      WHERE 
+                            user_id=? AND 
+                            user_token=? AND 
+                            token_address=?";
 
-			return putError(
-				'user unauthenticated', 
-				Users::ERROR_AUTH_INVALID, $response);	
+        $query = $mysqli->prepare($query_sql);
+        $query->bind_param("sss", 
+            $token[Users::ID_KEY],
+            $token[Users::TOKEN_KEY],
+            $token[Users::REMOTE_ADDR_KEY]);
 
-		} else {
+        $query->execute();      
+        $query->store_result();
 
-			$query->free_result();
-			$query->close();
-			$mysqli->close();
+        $row_count = $query->num_rows;      
 
-			return putError(
-				'database logic error', 
-				DATABASE::ERROR_DATABASE_LOGIC, $response);				
-		}		
-	}
+        $query->free_result();
+        $query->close();
+        $mysqli->close();
 
-	static public function checkToken($mysqli, $token) {
-		if (!($mysqli = Database::getConection()))
-			return false;		
+        return $row_count == 1;
+    }
 
-		$query_sql = "SELECT user_id
-					  FROM tokens
-					  WHERE user_id=? AND user_token=? AND token_address=?";
+    static public function deleteUser($user_id)
+    {
+        if (!($mysqli = Database::getConection()))
+            return false;                  
 
-		$query = $mysqli->prepare($query_sql);
-		$query->bind_param("sss", 
-			$token[Users::ID_KEY],
-			$token[Users::TOKEN_KEY],
-			$token[Users::REMOTE_ADDR_KEY]);
+        $query_sql = "DELETE 
+                      FROM 
+                            users 
+                      WHERE 
+                            user_id = ?";
 
-		$query->store_result();
+        $query = $mysqli->prepare($query_sql);              
+        $query->bind_param("s", $user_id);
 
-		$row_count = $query->num_rows;
+        $query->execute();
+        $query->close();
+        $mysqli->close();
 
-		$query->free_result();
-		$query->close();
-		$mysqli->close();
+        return true;    
+    }
 
-		return $row_count == 1;
-	}
+    static public function getPost($user_id, $post_id) 
+    {
+        if (!($mysqli = Database::getConection()))
+            return false;                 
 
-	static public function getPosts($mysqli, $user_id){
-		$query_sql = "SELECT post_id, post_privacy, post_timestamp, post_text, picture_path
-					  FROM posts 
-					  INNER JOIN pictures ON pictures.picture_id = post_picture 
-					  WHERE user_id = ?";
+        $query_sql = "SELECT 
+                            post_id, 
+                            user_id,
+                            post_privacy, 
+                            post_timestamp, 
+                            post_text, 
+                            picture_path
+                      FROM 
+                            posts 
+                      INNER JOIN 
+                            pictures 
+                      ON 
+                            picture_id = post_picture 
+                      WHERE 
+                            post_id = ? AND
+                            (user_id = ? OR 
+                                post_privacy = true OR 
+                                post_id IN (
+                                    SELECT 
+                                        post_id
+                                    FROM 
+                                        posts
+                                    INNER JOIN 
+                                        friendships
+                                    ON 
+                                        posts.user_id = friendships.friend_id AND
+                                        friendships.user_id = ?
+                                )
+                            )";
 
-		$query = $mysqli->prepare($query_sql);
-		$query->bind_param("s", $user_id);
-		$query->bind_result($post_id, $post_privacy, $post_timestamp, $post_text, $post_picture);
-		$query->execute();
+        $query = $mysqli->prepare($query_sql);
+        $query->bind_param("sss", 
+            $post_id, 
+            $user_id, 
+            $user_id);   
 
-		$posts = array();
+        $query->bind_result(
+            $post_id,
+            $post_user_id, 
+            $post_privacy, 
+            $post_timestamp, 
+            $post_text, 
+            $post_picture);
 
-		while($query->fetch()) {
-			$posts[]  = array(
-				'id' => $post_id,
-				'public' => $post_privacy,
-				'timestamp' => $post_timestamp,
-				'text' => $post_text,
-				'picture' => $post_picture
-			);
-		}
-		
-		$query->close();
-		return $posts;
-	}
+        $query->execute();
 
-	static public function getInfos($user_id){
-		$query = $mysqli->prepare("SELECT * FROM `users_info` WHERE user_id = ?");
-		$query->bind_param("s", $user_id);
-		while($row = $query->fetch_row()) {
-			$rows[]=$row;
-		}
-		$query->execute();
-		$query->close();
+        $post = array();
 
-	}
+        while($query->fetch()) {
+            $post  = array(
+                'id' => $post_id,
+                'user_id' => $post_user_id,
+                'public' => $post_privacy,
+                'timestamp' => $post_timestamp,
+                'text' => $post_text,
+                'picture' => $post_picture
+            );
+        }
+        
+        $query->close();
+
+        return $post;
+    }
+
+    static public function getPosts($mysqli, $user_id)
+    {
+        $query_sql = "SELECT 
+                            post_id, 
+                            post_privacy, 
+                            post_timestamp, 
+                            post_text, 
+                            picture_path
+                      FROM 
+                            posts 
+                      INNER JOIN 
+                            pictures 
+                      ON 
+                            pictures.picture_id = post_picture 
+                      WHERE 
+                            user_id = ?";
+
+        $query = $mysqli->prepare($query_sql);
+        $query->bind_param("s", $user_id);
+        $query->bind_result(
+            $post_id, 
+            $post_privacy, 
+            $post_timestamp, 
+            $post_text, 
+            $post_picture);
+
+        $query->execute();
+
+        $posts = array();
+
+        while($query->fetch()) {
+            $posts[]  = array(
+                'id' => $post_id,
+                'public' => $post_privacy,
+                'timestamp' => $post_timestamp,
+                'text' => $post_text,
+                'picture' => $post_picture
+            );
+        }
+        
+        $query->close();
+        return $posts;
+    }
+
+    static public function getInfos($user_id){
+        $query = $mysqli->prepare("SELECT * FROM `users_info` WHERE user_id = ?");
+        $query->bind_param("s", $user_id);
+        while($row = $query->fetch_row()) {
+            $rows[]=$row;
+        }
+        $query->execute();
+        $query->close();
+
+    }
 }
 
 ?>

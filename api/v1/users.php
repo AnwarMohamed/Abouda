@@ -28,82 +28,119 @@ class Users
     const ERROR_EMAIL_DUPLICATE = 1210;
     const ERROR_AUTH_INVALID = 1211;
 
-    static public function newUser($response, $data)
+    static public function newUser($response, $user)
     {
-        if (count($data) != 6) {
+        if (count($user) != 6) {
             return putError(
                 'invalid request parameters', 
                 Users::ERROR_FORMAT, $response);
         }
 
-        $data[Users::FNAME_KEY] = Validator::filterName($data, Users::FNAME_KEY);
-        $data[Users::LNAME_KEY] = Validator::filterName($data, Users::LNAME_KEY);
-        $data[Users::EMAIL_KEY] = Validator::filterEmail($data, Users::EMAIL_KEY);
-        $data[Users::GENDER_KEY] = Validator::filterGender($data, Users::GENDER_KEY);
-        $data[Users::PASSWORD_KEY] = Validator::filterPassword($data, Users::PASSWORD_KEY);        
-        $data[Users::BIRTHDATE_KEY] = Validator::filterDate($data, Users::BIRTHDATE_KEY);
-        $data[Users::REMOTE_ADDR_KEY] = $_SERVER['REMOTE_ADDR'];
+        $user[Users::FNAME_KEY] = Validator::filterName($user, Users::FNAME_KEY);
+        $user[Users::LNAME_KEY] = Validator::filterName($user, Users::LNAME_KEY);
+        $user[Users::EMAIL_KEY] = Validator::filterEmail($user, Users::EMAIL_KEY);
+        $user[Users::GENDER_KEY] = Validator::filterGender($user, Users::GENDER_KEY);
+        $user[Users::PASSWORD_KEY] = Validator::filterPassword($user, Users::PASSWORD_KEY);        
+        $user[Users::BIRTHDATE_KEY] = Validator::filterDate($user, Users::BIRTHDATE_KEY);
+        $user[Users::REMOTE_ADDR_KEY] = $_SERVER['REMOTE_ADDR'];
 
-        if (!$data[Users::FNAME_KEY]) {
+        if (!$user[Users::FNAME_KEY]) {
             return putError(
                 'invalid firstname parameter', 
                 Users::ERROR_FNAME_FORMAT, $response);
         } 
-        else if (!$data[Users::LNAME_KEY]) {
+        else if (!$user[Users::LNAME_KEY]) {
             return putError(
                 'invalid lastname parameter', 
                 Users::ERROR_LNAME_FORMAT, $response);
         }
-        else if (!$data[Users::EMAIL_KEY]) {
+        else if (!$user[Users::EMAIL_KEY]) {
             return putError(
                 'invalid email parameter', 
                 Users::ERROR_EMAIL_FORMAT, $response);
         }
-        else if (!$data[Users::PASSWORD_KEY]) {
+        else if (!$user[Users::PASSWORD_KEY]) {
             return putError(
                 'invalid password parameter', 
                 Users::ERROR_PASSWORD_FORMAT, $response);
         }
-        else if (!$data[Users::GENDER_KEY]) {
+        else if (!$user[Users::GENDER_KEY]) {
             return putError(
                 'invalid gender parameter', 
                 Users::ERROR_GENDER_FORMAT, $response);
         }
-        else if (!$data[Users::BIRTHDATE_KEY]) {
+        else if (!$user[Users::BIRTHDATE_KEY]) {
             return putError(
                 'invalid birthdate parameter', 
                 Users::ERROR_BIRTHDATE_FORMAT, $response);
         }   
         
-        $data[Users::GENDER_KEY] = ($data[Users::GENDER_KEY] == "male");
+        $user[Users::GENDER_KEY] = ($user[Users::GENDER_KEY] == "male");
 
-        return Database::newUser($response, $data);
+
+        $duplicate = Database::checkEmail($user[Users::EMAIL_KEY]);
+
+        if ($duplicate) {
+            return putError(
+                'duplicate email parameter', 
+                Users::ERROR_EMAIL_DUPLICATE, $response);
+        }
+
+        $user = Database::newUser($user);
+
+        if (!$user) {
+            return putError(
+                'database connection error', 
+                DATABASE::ERROR_DATABASE_CONN, $response);   
+        }
+
+        return putJsonBody(array(
+            'error' => false,
+            'result' => array(
+                'user_id' => $user[Users::ID_KEY],
+                'token' => $user[Users::TOKEN_KEY],
+            )
+        ), 200, $response); 
     }
 
-    static public function authenticate($response, $data) 
+    static public function authUser($response, $creds) 
     {
-        if (count($data) != 2) {
+        if (count($creds) != 2) {
             return putError(
                 'invalid request parameters', 
                 Users::ERROR_FORMAT, $response);
         }
 
-        $data[Users::EMAIL_KEY] = Validator::filterEmail($data, Users::EMAIL_KEY);        
-        $data[Users::PASSWORD_KEY] = Validator::filterPassword($data, Users::PASSWORD_KEY);
-        $data[Users::REMOTE_ADDR_KEY] = $_SERVER['REMOTE_ADDR'];
+        $creds[Users::EMAIL_KEY] = Validator::filterEmail($creds, Users::EMAIL_KEY);        
+        $creds[Users::PASSWORD_KEY] = Validator::filterPassword($creds, Users::PASSWORD_KEY);
+        $creds[Users::REMOTE_ADDR_KEY] = $_SERVER['REMOTE_ADDR'];
 
-        if (!$data[Users::EMAIL_KEY]) {
+        if (!$creds[Users::EMAIL_KEY]) {
             return putError(
                 'invalid email parameter', 
                 Users::ERROR_EMAIL_FORMAT, $response);
         }
-        else if (!$data[Users::PASSWORD_KEY]) {
+        else if (!$creds[Users::PASSWORD_KEY]) {
             return putError(
                 'invalid password parameter', 
                 Users::ERROR_PASSWORD_FORMAT, $response);
         }
 
-        return Database::authenticate($response, $data);
+        $creds = Database::authUser($creds);
+
+        if (!$creds) {
+            return putError(
+                'invalid user credentials', 
+                Users::ERROR_AUTH_INVALID, $response);
+        }
+
+        return putJsonBody(array(
+            'error' => false,
+            'result' => array(
+                'user_id' => $creds[Users::ID_KEY],
+                'token' => $creds[Users::TOKEN_KEY],
+            )
+        ), 200, $response);  
     }
 
     static public function deleteMe($response, $token)
@@ -114,7 +151,17 @@ class Users
                 Users::ERROR_AUTH_INVALID, $response);            
         }
 
-        
+        $delete = Database::deleteUser($token[Users::ID_KEY]);
+
+        if (!$delete) {
+            return putError(
+                'database connection error', 
+                DATABASE::ERROR_DATABASE_CONN, $response);             
+        }
+
+        return putJsonBody(array(
+            'error' => false,
+        ), 200, $response);          
     }
 
     static public function getMe($response)
