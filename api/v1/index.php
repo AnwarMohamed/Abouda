@@ -2,6 +2,7 @@
 require 'plugins/vendor/autoload.php';
 require 'users.php';
 require 'posts.php';
+require 'friends.php';
 
 $debug_mode = false;
 
@@ -103,7 +104,7 @@ $app->post('/user/new', function ($request, $response) {
 });
 
 /* Handle authenticate user */
-$app->post('/user/', function ($request, $response) {    
+$app->post('/user/me', function ($request, $response) {    
     $data = parseJsonBody($request);    
     return Users::authUser($response, $data);
 });
@@ -112,6 +113,39 @@ $app->post('/user/', function ($request, $response) {
 $app->delete('/user/me', function ($request, $response) {
     $token = parseToken($request);    
     return Users::deleteMe($response, $token);
+});
+
+
+/* Handle get my blocked friends */
+$app->get('/user/me/friends/blocked', function ($request, $response) {
+    $token = parseToken($request);    
+    return Friends::getBlocked($response, $token);
+});
+
+/* Handle get my waiting friends */
+$app->get('/user/me/friends/waiting', function ($request, $response) {
+    $token = parseToken($request);    
+    return Friends::getWaiting($response, $token);
+});
+
+/* Handle get my requested friends */
+$app->get('/user/me/friends/requested', function ($request, $response) {
+    $token = parseToken($request);    
+    return Friends::getRequested($response, $token);
+});
+
+/* Handle get my accepted friends */
+$app->get('/user/me/friends/accepted', function ($request, $response) {
+    $token = parseToken($request);    
+    return Friends::getAccepted($response, $token, null);
+});
+
+
+/* Handle get user accepted friends */
+$app->get('/user/{id:[0-9]+}/friends', function ($request, $response, $args) {
+    $token = parseToken($request);
+    $friend_id = $args['id'];
+    return Friends::getAccepted($response, $token, $friend_id);
 });
 
 

@@ -4,7 +4,7 @@ class Posts
 {
 	static public function getPost($response, $token, $post_id)
 	{
-        if (!$token || !Database::checkToken(null, $token)) {
+        if (!Database::checkToken($token)) {
             return putError(
                 'invalid token', 
                 Users::ERROR_AUTH_INVALID, $response);            
@@ -19,9 +19,9 @@ class Posts
         }
 
         return putJsonBody(array(
-                'error' => false,                
-                'post' => $post
-            ), 200, $response);   
+            'error' => false,                
+            'post' => $post
+        ), 200, $response);   
 	}
 }
 

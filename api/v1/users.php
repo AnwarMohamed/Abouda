@@ -145,7 +145,7 @@ class Users
 
     static public function deleteMe($response, $token)
     {
-        if (!$token || !Database::checkToken(null, $token)) {
+        if (!Database::checkToken($token)) {
             return putError(
                 'invalid token', 
                 Users::ERROR_AUTH_INVALID, $response);            
