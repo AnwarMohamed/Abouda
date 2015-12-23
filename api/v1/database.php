@@ -10,118 +10,6 @@ class Database
         return $mysqli->connect_errno ? false: $mysqli;
     }
 
-    static public function getPost($user_id, $post_id) 
-    {
-        if (!($mysqli = Database::getConection()))
-            return false;                 
-
-        $query_sql = "SELECT 
-                            post_id, 
-                            user_id,
-                            post_privacy, 
-                            post_timestamp, 
-                            post_text, 
-                            picture_path
-                      FROM 
-                            posts 
-                      INNER JOIN 
-                            pictures 
-                      ON 
-                            picture_id = post_picture 
-                      WHERE 
-                            post_id = ? AND
-                            (user_id = ? OR 
-                                post_privacy = true OR 
-                                post_id IN (
-                                    SELECT 
-                                        post_id
-                                    FROM 
-                                        posts
-                                    INNER JOIN 
-                                        friendships
-                                    ON 
-                                        posts.user_id = friendships.friend_id AND
-                                        friendships.user_id = ?
-                                )
-                            )";
-
-        $query = $mysqli->prepare($query_sql);
-        $query->bind_param("sss", 
-            $post_id, 
-            $user_id, 
-            $user_id);   
-
-        $query->bind_result(
-            $post_id,
-            $post_user_id, 
-            $post_privacy, 
-            $post_timestamp, 
-            $post_text, 
-            $post_picture);
-
-        $query->execute();
-
-        $post = array();
-
-        while($query->fetch()) {
-            $post  = array(
-                'id' => $post_id,
-                'user_id' => $post_user_id,
-                'public' => $post_privacy,
-                'timestamp' => $post_timestamp,
-                'text' => $post_text,
-                'picture' => $post_picture
-            );
-        }
-        
-        $query->close();
-        return $post;
-    }
-
-    static public function getPosts($mysqli, $user_id)
-    {
-        $query_sql = "SELECT 
-                            post_id, 
-                            post_privacy, 
-                            post_timestamp, 
-                            post_text, 
-                            picture_path
-                      FROM 
-                            posts 
-                      INNER JOIN 
-                            pictures 
-                      ON 
-                            pictures.picture_id = post_picture 
-                      WHERE 
-                            user_id = ?";
-
-        $query = $mysqli->prepare($query_sql);
-        $query->bind_param("s", $user_id);
-        $query->bind_result(
-            $post_id, 
-            $post_privacy, 
-            $post_timestamp, 
-            $post_text, 
-            $post_picture);
-
-        $query->execute();
-
-        $posts = array();
-
-        while($query->fetch()) {
-            $posts[]  = array(
-                'id' => $post_id,
-                'public' => $post_privacy,
-                'timestamp' => $post_timestamp,
-                'text' => $post_text,
-                'picture' => $post_picture
-            );
-        }
-        
-        $query->close();
-        return $posts;
-    }
-
     static public function getInfos($user_id){
         $query = $mysqli->prepare("SELECT * FROM `users_info` WHERE user_id = ?");
         $query->bind_param("s", $user_id);
@@ -132,8 +20,6 @@ class Database
         $query->close();
 
     }
-
-
 
     static public function getFriends($user_id, $friendship_type, $friend_id)
     {

@@ -9,8 +9,10 @@ class UsersDB extends Database
 
         $mysqli->autocommit(FALSE);
 
-        $query_sql = "INSERT INTO users 
-                      VALUES (default,?,SHA1(?))";
+        $query_sql = "  INSERT INTO 
+                            users 
+                        VALUES 
+                            (default,?,SHA1(?))";
 
         $query = $mysqli->prepare($query_sql);              
         $query->bind_param("ss", 
@@ -22,14 +24,14 @@ class UsersDB extends Database
 
         $user[Users::ID_KEY] = strval($mysqli->insert_id);
 
-        $query_sql = "INSERT INTO 
+        $query_sql = "  INSERT INTO 
                             users_info 
                             (user_id, 
                                 user_fname, 
                                 user_lname, 
                                 user_gender, 
                                 user_birthdate) 
-                      VALUES 
+                        VALUES 
                             (?,?,?,?,?)";
 
         $query = $mysqli->prepare($query_sql);              
@@ -55,11 +57,11 @@ class UsersDB extends Database
         if (!($mysqli = UsersDB::getConection()))
             return false;                  
 
-        $query_sql = "SELECT 
+        $query_sql = "  SELECT 
                             user_id 
-                      FROM 
+                        FROM 
                             users 
-                      WHERE 
+                        WHERE 
                             user_email = ? AND 
                             user_password = SHA1(?)";
 
@@ -96,10 +98,10 @@ class UsersDB extends Database
         if (!($mysqli = UsersDB::getConection()))
             return false;                  
 
-        $query_sql = "DELETE 
-                      FROM 
+        $query_sql = "  DELETE 
+                        FROM 
                             users 
-                      WHERE 
+                        WHERE 
                             user_id = ?";
 
         $query = $mysqli->prepare($query_sql);              
@@ -117,11 +119,11 @@ class UsersDB extends Database
         if (!($mysqli = Database::getConection()))
             return false;
 
-        $query_sql = "SELECT 
+        $query_sql = "  SELECT 
                             COUNT(user_email) 
-                      FROM 
+                        FROM 
                             users 
-                      WHERE 
+                        WHERE 
                             user_email = ?";
 
         $query = $mysqli->prepare($query_sql);          

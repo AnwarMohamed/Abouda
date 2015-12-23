@@ -2,6 +2,7 @@
 require 'plugins/vendor/autoload.php';
 require 'database.php';
 require 'users.php';
+require 'users_info.php';
 require 'posts.php';
 require 'friends.php';
 
@@ -98,6 +99,7 @@ function putError($body, $code, $response) {
 }
 
 
+
 /* Handle new user */
 $app->post('/user/new', function ($request, $response) {
     $data = parseJsonBody($request);        
@@ -107,32 +109,80 @@ $app->post('/user/new', function ($request, $response) {
 /* Handle authenticate user */
 $app->post('/user/me', function ($request, $response) {    
     $data = parseJsonBody($request);    
-    return Users::authUser($response, $data);
+    return Users::auth($response, $data);
 });
 
 /* Handle delete current user */
 $app->delete('/user/me', function ($request, $response) {
     $token = parseToken($request);    
-    return Users::deleteMe($response, $token);
+    return Users::delete($response, $token);
 });
+
+
+
+/* Handle get my info */
+$app->get('/user/{id:[0-9]+}/info', function ($request, $response, $args) {
+    $token = parseToken($request);
+    $friend_id = $args['id'];
+    return UsersInfo::get($response, $token, $friend_id);
+});
+
+/* Handle get user info */
+$app->get('/user/me/info', function ($request, $response) {
+    $token = parseToken($request);    
+    return UsersInfo::get($response, $token, null);
+});
+
+/* Handle update my info */
+$app->put('/user/me/info', function ($request, $response) {
+    $token = parseToken($request);
+    $data = parseJsonBody($request);
+    return UsersInfo::update($response, $token, $data);
+});
+
+
+
+
 
 
 /* Handle get my blocked friends */
 $app->get('/user/me/friends/blocked', function ($request, $response) {
     $token = parseToken($request);    
-    return Friends::getBlocked($response, $token);
+    return Friends::blocked($response, $token);
 });
+
+/* Handle block friend */
+$app->post('/user/me/friends/block', function ($request, $response) {
+    $token = parseToken($request);
+    $data = parseJsonBody($request);    
+    return Friends::block($response, $token, $data);
+});
+
+/* Handle unblock friend */
+$app->delete('/user/me/friends/blocked/{id:[0-9]+}', function ($request, $response) {
+    $token = parseToken($request);
+    $friend_id = $args['id'];
+    return Friends::unblock($response, $token, $friend_id);
+});
+
 
 /* Handle get my waiting friends */
 $app->get('/user/me/friends/waiting', function ($request, $response) {
     $token = parseToken($request);    
-    return Friends::getWaiting($response, $token);
+    return Friends::waiting($response, $token);
 });
 
 /* Handle get my requested friends */
 $app->get('/user/me/friends/requested', function ($request, $response) {
     $token = parseToken($request);    
-    return Friends::getRequested($response, $token);
+    return Friends::requested($response, $token);
+});
+
+/* Handle add friend */
+$app->post('/user/me/friends/request', function ($request, $response) {
+    $token = parseToken($request); 
+    $data = parseJsonBody($request);   
+    return Friends::request($response, $token, $data);
 });
 
 /* Handle get my accepted friends */
@@ -155,26 +205,6 @@ $app->get('/post/{id}', function ($request, $response, $args) {
     $token = parseToken($request);
     $post_id = $args['id'];
     return Posts::getPost($response, $token, $post_id);
-});
-
-
-/* Handle update current user */
-$app->put('/user/me', function ($request, $response) {
-    $token = parseToken($request);
-    $data = parseJsonBody($request);
-    return Users::updateMe($response, $token, $data);
-});
-
-/* Handle get current user */
-$app->get('/user/me', function ($request, $response) {
-    $token = parseToken($request);    
-    return Users::getMe($response, $token);
-});
-
-/* Handle existing user */
-$app->get('/user/:id', function ($request, $response, $args) { 
-    $token = parseToken($request);        
-    return Users::getUser($response, $token, $id);
 });
 
 $app->run();

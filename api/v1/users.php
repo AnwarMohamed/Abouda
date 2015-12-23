@@ -77,7 +77,6 @@ class Users
         
         $user[Users::GENDER_KEY] = ($user[Users::GENDER_KEY] == "male");
 
-
         $duplicate = UsersDB::duplicate($user[Users::EMAIL_KEY]);
 
         if ($duplicate) {
@@ -88,7 +87,7 @@ class Users
 
         $user = UsersDB::create($user);
 
-        if (!$user) {
+        if ($user === FALSE) {
             return putError(
                 'database connection error', 
                 DATABASE::ERROR_DATABASE_CONN, $response);   
@@ -103,7 +102,7 @@ class Users
         ), 200, $response); 
     }
 
-    static public function authUser($response, $creds) 
+    static public function auth($response, $creds) 
     {
         if (count($creds) != 2) {
             return putError(
@@ -128,7 +127,7 @@ class Users
 
         $creds = UsersDB::auth($creds);
 
-        if (!$creds) {
+        if ($creds === FALSE) {
             return putError(
                 'invalid user credentials', 
                 Users::ERROR_AUTH_INVALID, $response);
@@ -143,7 +142,7 @@ class Users
         ), 200, $response);  
     }
 
-    static public function deleteMe($response, $token)
+    static public function delete($response, $token)
     {
         if (!TokensDB::check($token)) {
             return putError(
@@ -153,7 +152,7 @@ class Users
 
         $delete = UsersDB::delete($token[Users::ID_KEY]);
 
-        if (!$delete) {
+        if ($delete === FALSE) {
             return putError(
                 'database connection error', 
                 DATABASE::ERROR_DATABASE_CONN, $response);             
@@ -162,16 +161,6 @@ class Users
         return putJsonBody(array(
             'error' => false,
         ), 200, $response);          
-    }
-
-    static public function getMe($response)
-    {
-
-    }
-
-    static public function updateMe($app, $data)
-    {
-
     }
 }
 

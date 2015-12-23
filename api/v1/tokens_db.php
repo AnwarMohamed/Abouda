@@ -39,11 +39,11 @@ class TokensDB extends Database
         if (!($mysqli = TokensDB::getConection()))
             return false;       
 
-        $query_sql = "SELECT 
+        $query_sql = "  SELECT 
                             user_id
-                      FROM 
+                        FROM 
                             tokens
-                      WHERE 
+                        WHERE 
                             user_id=? AND 
                             user_token=? AND 
                             token_address=?";
@@ -61,7 +61,7 @@ class TokensDB extends Database
 
         $query->free_result();
         $query->close();
-        $mysqli->close();
+        $mysqli->close();        
 
         return $row_count == 1;
     }    
