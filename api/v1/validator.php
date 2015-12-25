@@ -10,7 +10,15 @@ class Validator
         if (!preg_match("/^[a-zA-Z'-]+$/", trim($data[$key])))
             return false;
 
-        return filter_var(trim($data[$key]), FILTER_SANITIZE_STRING);
+        return filter_var(ucfirst(trim($data[$key])), FILTER_SANITIZE_STRING);
+    }
+
+    static public function filterMobile($data, $key) 
+    {   
+        if (isset($data[$key]))            
+            return preg_match("/[^0-9]/", trim($data[$key]));
+
+        return null;
     }
 
     static public function filterEmail($data, $key) 
@@ -71,6 +79,14 @@ class Validator
         return filter_var(trim($data[$key]), FILTER_SANITIZE_STRING);
     }    
 
+    static public function filterAbout($data, $key) 
+    {
+        if (isset($data[$key]) && strlen(trim($data[$key])))
+            return filter_var(trim($data[$key]), FILTER_SANITIZE_STRING);
+
+        return null;
+    }
+
     static public function filterPrivacy($data, $key) 
     {
         if (!isset($data[$key]))
@@ -81,7 +97,15 @@ class Validator
             return false;
 
         return trim($data[$key]);
-    }    
+    } 
+
+    static public function filterMarital($data, $key) 
+    {
+        if (isset($data[$key]))
+            return trim($data[$key]);
+
+        return null;
+    }        
 }
 
 ?>

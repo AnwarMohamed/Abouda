@@ -100,7 +100,6 @@ class UsersInfoDB extends Database
                 $user_id);                                                 
         }
 
-
         $query->bind_result(
             $user_fname,
             $user_lname,
@@ -130,8 +129,43 @@ class UsersInfoDB extends Database
         $mysqli->close();
 
         return $info;
-
     }
+
+    static public function update($user_id, $info)
+    {
+        if (!($mysqli = UsersInfoDB::getConection()))
+            return false;
+
+        $query_sql = "  UPDATE
+                            users_info
+                        SET                            
+                            user_fname = ?,
+                            user_lname = ?,
+                            user_mobile = ?,
+                            user_gender = ?,
+                            user_birthdate = ?,
+                            user_marital = ?,
+                            user_about = ?
+                        WHERE
+                            user_id = ?";
+
+        $query = $mysqli->prepare($query_sql);
+        $query->bind_param("ssssssss",             
+            $info[Users::FNAME_KEY],
+            $info[Users::LNAME_KEY],
+            $info[Users::MOBILE_KEY],
+            $info[Users::GENDER_KEY],
+            $info[Users::BIRTHDATE_KEY],
+            $info[Users::MARITAL_KEY],
+            $info[Users::ABOUT_KEY],
+            $user_id); 
+
+        $query->execute();
+        $query->close();
+        $mysqli->close();
+                
+        return $info;
+    }    
 }
 
 ?>
