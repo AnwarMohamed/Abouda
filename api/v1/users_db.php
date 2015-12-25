@@ -22,15 +22,19 @@ class UsersDB extends Database
         $query->execute();
         $query->close();
 
+        //var_dump($user);
+
         $user[Users::ID_KEY] = strval($mysqli->insert_id);
 
         $query_sql = "  INSERT INTO 
                             users_info 
-                            (user_id, 
+                            (
+                                user_id, 
                                 user_fname, 
                                 user_lname, 
                                 user_gender, 
-                                user_birthdate) 
+                                user_birthdate
+                            ) 
                         VALUES 
                             (?,?,?,?,?)";
 
@@ -42,12 +46,17 @@ class UsersDB extends Database
             $user[Users::GENDER_KEY],
             $user[Users::BIRTHDATE_KEY]);
 
+        $query->execute();
         $query->close();
+
+        //var_dump($user);
 
         $user = TokensDB::create($mysqli, $user);
 
         $mysqli->commit();
         $mysqli->close();       
+
+        
 
         return $user;        
     }   

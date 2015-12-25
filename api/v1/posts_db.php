@@ -2,57 +2,65 @@
 
 class PostsDB extends Database
 {
-	const ID_KEY = 'id';
-	const USER_ID_KEY = 'user_id';
-	const PRIVACY_PUBLIC_KEY = 'public';
-	const TIMESTAMP_KEY = 'timestamp';
-	const TEXT_KEY = 'text';
-	const PICTURE_KEY = 'picture';
-
     static public function get($user_id, $post_id) 
     {
         if (!($mysqli = Database::getConection()))
             return false;                 
 
-        $query_sql = "	SELECT 
+        $query_sql = "  SELECT 
                             post_id, 
-                            user_id,
+                            posts.user_id,
+                            concat(user_fname, ' ', user_lname),                            
                             post_privacy, 
                             post_timestamp, 
                             post_text, 
                             picture_path
-                      	FROM 
+                        FROM 
                             posts 
-                      	INNER JOIN 
+                        LEFT JOIN 
                             pictures 
-                      	ON 
-                            picture_id = post_picture 
-                      	WHERE 
-                            post_id = ? AND
-                            (user_id = ? OR 
-                                post_privacy = true OR 
-                                post_id IN (
-                                    SELECT 
-                                        post_id
-                                    FROM 
-                                        posts
-                                    INNER JOIN 
-                                        friendships
-                                    ON 
-                                        posts.user_id = friendships.friend_id AND
-                                        friendships.user_id = ?
-                                )
-                            )";
+                        ON 
+                            picture_id = post_picture
+                        LEFT JOIN
+                            users_info
+                        ON
+                            posts.user_id = users_info.user_id
+                        WHERE
+                            post_id
+                        IN  
+                        (                            
+                            SELECT 
+                                post_id
+                            FROM
+                                posts
+                            WHERE
+                                post_privacy=0 OR user_id = ?
+                                         
+                            UNION 
+                            
+                            SELECT 
+                                post_id
+                            FROM
+                                friendships
+                            INNER JOIN
+                                posts
+                            ON
+                                friendships.friend_id = posts.user_id AND
+                                friendships.user_id = ?
+
+                        ) AND post_id = ?";
 
         $query = $mysqli->prepare($query_sql);
-        $query->bind_param("sss", 
-            $post_id, 
-            $user_id, 
-            $user_id);   
+        var_dump($mysqli->error);
+        $query->bind_param("sss",            
+            $user_id,
+            $user_id,
+            $post_id); 
 
         $query->bind_result(
             $post_id,
             $post_user_id, 
+            $post_user_name,
             $post_privacy, 
             $post_timestamp, 
             $post_text, 
@@ -64,12 +72,13 @@ class PostsDB extends Database
 
         while($query->fetch()) {
             $post  = array(
-                PostsDB::ID_KEY => $post_id,
-                PostsDB::USER_ID_KEY => $post_user_id,
-                PostsDB::PRIVACY_PUBLIC_KEY => $post_privacy,
-                PostsDB::TIMESTAMP_KEY => $post_timestamp,
-                PostsDB::TEXT_KEY => $post_text,
-                PostsDB::PICTURE_KEY => $post_picture
+                Posts::ID_KEY => $post_id,
+                Posts::USER_ID_KEY => $post_user_id,
+                Posts::USER_NAME_KEY => $post_user_name,
+                Posts::PRIVACY_PUBLIC_KEY => $post_privacy,
+                Posts::TIMESTAMP_KEY => $post_timestamp,
+                Posts::TEXT_KEY => $post_text,
+                Posts::PICTURE_KEY => $post_picture
             );
         }
         
@@ -84,35 +93,51 @@ class PostsDB extends Database
         if (!($mysqli = Database::getConection()))
             return false; 
 
-        $query_sql = "	SELECT 
+        $query_sql = "  SELECT 
                             post_id, 
                             user_id,
                             post_privacy, 
                             post_timestamp, 
                             post_text, 
                             picture_path
-                      	FROM 
+                        FROM 
                             posts 
-                      	INNER JOIN 
+                        INNER JOIN 
                             pictures 
-                      	ON 
+                        ON 
                             picture_id = post_picture 
-                      	WHERE 
-                            user_id = ? OR 
-                            post_privacy = true OR 
-                            post_id IN (
+                        WHERE
+                            post_id
+                        IN  
+                        (
+                            (
                                 SELECT 
                                     post_id
-                                FROM 
+                                FROM
                                     posts
-                                INNER JOIN 
+                                WHERE
+                                    post_privacy=0
+                            ) 
+                            UNION 
+                            (
+                                SELECT 
+                                    post_id
+                                FROM
                                     friendships
-                                ON 
-                                    posts.user_id = friendships.friend_id AND
-                                    friendships.user_id = ?)";
+                                INNER JOIN
+                                    posts
+                                ON
+                                    friendships.friend_id = posts.user_id AND
+                                    friendships.user_id = ?                             
+                            )
+                            
+                        ) AND post_id = ?";
 
         $query = $mysqli->prepare($query_sql);
-        $query->bind_param("ss", $user_id, $user_id);
+        $query->bind_param("ss",            
+            $user_id,           
+            $post_id);
+
         $query->bind_result(
             $post_id, 
             $post_user_id,
@@ -127,11 +152,11 @@ class PostsDB extends Database
 
         while($query->fetch()) {
             $posts[]  = array(
-                PostsDB::ID_KEY => $post_id,
-                PostsDB::PRIVACY_PUBLIC_KEY => $post_privacy,
-                PostsDB::TIMESTAMP_KEY => $post_timestamp,
-                PostsDB::TEXT_KEY => $post_text,
-                PostsDB::PICTURE_KEY => $post_picture
+                Posts::ID_KEY => $post_id,
+                Posts::PRIVACY_PUBLIC_KEY => $post_privacy,
+                Posts::TIMESTAMP_KEY => $post_timestamp,
+                Posts::TEXT_KEY => $post_text,
+                Posts::PICTURE_KEY => $post_picture
             );
         }
         
@@ -139,6 +164,35 @@ class PostsDB extends Database
         $mysqli->close();
 
         return $posts;
+    }    
+
+    static public function create($user_id, $post) 
+    {
+        if (!($mysqli = Database::getConection()))
+            return false;                 
+
+        $mysqli->autocommit(FALSE);
+
+        $query_sql = "  INSERT INTO 
+                            posts
+                        VALUES 
+                            (default,?,?,NOW(),?,default)";
+
+        $query = $mysqli->prepare($query_sql);
+        $query->bind_param("sss", 
+            $user_id, 
+            $post[Posts::PRIVACY_KEY],            
+            $post[Posts::TEXT_KEY]);   
+
+        $query->execute();        
+        $query->close();
+
+        $post[Posts::ID_KEY] = strval($mysqli->insert_id);
+
+        $mysqli->commit();
+        $mysqli->close(); 
+
+        return $post;
     }    
 }
 

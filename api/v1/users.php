@@ -11,6 +11,9 @@ class Users
     const PASSWORD_KEY = 'password';
     const GENDER_KEY = 'gender';
     const BIRTHDATE_KEY = 'birthdate';
+    const MOBILE_KEY = 'mobile';
+    const MARITAL_KEY = 'marital';
+    const ABOUT_KEY = 'about';
 
     const ID_KEY = 'user_id';
     const TOKEN_KEY = 'token';

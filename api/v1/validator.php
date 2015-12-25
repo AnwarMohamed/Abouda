@@ -35,7 +35,6 @@ class Validator
         return trim($data[$key]);
     }
 
-
     static public function filterGender($data, $key) 
     {
         if (!isset($data[$key]))
@@ -47,7 +46,6 @@ class Validator
 
         return trim($data[$key]);
     }
-
 
     static public function filterDate($data, $key, $format = 'Y-m-d') 
     {
@@ -61,6 +59,29 @@ class Validator
 
         return trim($data[$key]);
     }
+
+    static public function filterText($data, $key) 
+    {   
+        if (!isset($data[$key]))
+            return false;
+
+        if (!strlen(trim($data[$key])))
+            return false;
+
+        return filter_var(trim($data[$key]), FILTER_SANITIZE_STRING);
+    }    
+
+    static public function filterPrivacy($data, $key) 
+    {
+        if (!isset($data[$key]))
+            return false;
+
+        if (strcmp(trim($data[$key]), "public") &&
+            strcmp(trim($data[$key]), "private"))
+            return false;
+
+        return trim($data[$key]);
+    }    
 }
 
 ?>

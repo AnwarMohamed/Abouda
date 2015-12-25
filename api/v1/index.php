@@ -204,7 +204,14 @@ $app->get('/user/{id:[0-9]+}/friends', function ($request, $response, $args) {
 $app->get('/post/{id}', function ($request, $response, $args) {
     $token = parseToken($request);
     $post_id = $args['id'];
-    return Posts::getPost($response, $token, $post_id);
+    return Posts::get($response, $token, $post_id);
+});
+
+/* Handle insert post */
+$app->post('/post/', function ($request, $response, $args) {
+    $token = parseToken($request);
+    $data = parseJsonBody($request);  
+    return Posts::create($response, $token, $data);
 });
 
 $app->run();
