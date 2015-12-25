@@ -8,6 +8,8 @@ class FriendsDB extends Database
             return false;
 
         if ($user_id != $friend_id) {
+            $mysqli->autocommit(FALSE);
+
             $query_sql = "  INSERT INTO
                                 friendships
                             VALUES
@@ -37,8 +39,10 @@ class FriendsDB extends Database
             $query->execute();                         
             $query->close();
 
-            $mysqli->close();
+            $mysqli->commit();            
         }
+
+        $mysqli->close();
 
         return true;
     }
@@ -100,7 +104,7 @@ class FriendsDB extends Database
         if (!($mysqli = FriendsDB::connect()))
             return false;
 
-        if ($user_id != $friend_id) {
+        if ($user_id != $friend_id) {            
             $query_sql = "  DELETE FROM
                                 friendships
                             WHERE
@@ -116,13 +120,86 @@ class FriendsDB extends Database
                 $friend_id); 
 
             $query->execute();                         
-            $query->close();
-
-            $mysqli->close();
+            $query->close();            
         }
 
+        $mysqli->close();
+
         return true;
-    }    
+    } 
+
+    static public function unrequest($user_id, $friend_id)
+    {
+        if (!($mysqli = FriendsDB::connect()))
+            return false;
+
+        if ($user_id != $friend_id) {            
+            $query_sql = "  DELETE FROM
+                                friendships
+                            WHERE
+                                user_id = ?
+                            AND
+                                friend_id = ?
+                            AND
+                                friendship_type = 'requested'";
+
+            $query = $mysqli->prepare($query_sql);                  
+            $query->bind_param("ss",                 
+                $user_id,
+                $friend_id); 
+
+            $query->execute();                         
+            $query->close();
+        }
+
+        $mysqli->close();
+
+        return true;
+    }
+
+    static public function request($user_id, $friend_id)
+    {
+        if (!($mysqli = FriendsDB::connect()))
+            return false;
+
+        if ($user_id != $friend_id) {            
+            $query_sql = "  INSERT INTO
+                                friendships
+                            SELECT
+                                ?,?,'requested',NOW()
+                            FROM
+                                friendships
+                            WHERE
+                                ?
+                            NOT IN 
+                            (
+                                SELECT 
+                                    friend_id
+                                FROM
+                                    friendships
+                                WHERE
+                                    user_id = ?
+                                AND
+                                    friend_id = ?
+                            )";                            
+
+            $query = $mysqli->prepare($query_sql); 
+            var_dump($mysqli->error);                 
+            $query->bind_param("sss",
+                $user_id,
+                $friend_id,
+                $friend_id,
+                $user_id,
+                $friend_id); 
+
+            $query->execute();                         
+            $query->close();
+        }
+
+        $mysqli->close();
+
+        return true;
+    }     
 }
 
 ?>

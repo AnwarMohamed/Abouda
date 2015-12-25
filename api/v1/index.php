@@ -187,6 +187,22 @@ $app->delete('/user/{id:[0-9]+}/block', function ($request, $response) {
 
 
 
+/* Handle add friend */
+$app->post('/user/{id:[0-9]+}/request', function ($request, $response) {
+    $token = parseToken($request); 
+    $friend_id = $args['id'];
+    return Friends::request($response, $token, $friend_id);
+});
+
+/* Handle delete friend */
+$app->delete('/user/{id:[0-9]+}/request', function ($request, $response) {
+    $token = parseToken($request); 
+    $friend_id = $args['id'];
+    return Friends::unrequest($response, $token, $friend_id);
+});
+
+
+
 /* Handle get my waiting friends */
 $app->get('/user/me/friends/waiting', function ($request, $response) {
     $token = parseToken($request);    

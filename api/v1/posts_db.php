@@ -50,8 +50,7 @@ class PostsDB extends Database
 
                         ) AND post_id = ?";
 
-        $query = $mysqli->prepare($query_sql);
-        var_dump($mysqli->error);
+        $query = $mysqli->prepare($query_sql);        
         $query->bind_param("sss",            
             $user_id,
             $user_id,
