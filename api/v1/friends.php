@@ -1,10 +1,11 @@
 <?php
 
 require_once 'tokens_db.php';
+require 'friends_db.php';
 
 class Friends
 {
-    static public function getBlocked($response, $token)
+    static public function blocked($response, $token)
     {
         if (!TokensDB::check($token)) {
             return putError(
@@ -12,13 +13,40 @@ class Friends
                 Users::ERROR_AUTH_INVALID, $response);            
         }
 
-        $blocked = Database::getFriends($token[Users::ID_KEY], 'blocked', null);
+        $blocked = FriendsDB::blocked($token[Users::ID_KEY]);
+
+        if ($blocked === FALSE) {
+            return putError(
+                'database connection error', 
+                DATABASE::ERROR_DATABASE_CONN, $response);             
+        }
 
         return putJsonBody(array(
             'error' => false,                
             'friends' => $blocked
         ), 200, $response); 
     }   
+
+    static public function block($response, $token, $friend_id)
+    {
+        if (!TokensDB::check($token)) {
+            return putError(
+                'invalid token', 
+                Users::ERROR_AUTH_INVALID, $response);            
+        }
+
+        $unblocked = FriendsDB::unblock($token[Users::ID_KEY], $friend_id);
+
+        if ($unblocked === FALSE) {
+            return putError(
+                'database connection error', 
+                DATABASE::ERROR_DATABASE_CONN, $response);             
+        }
+
+        return putJsonBody(array(
+            'error' => false            
+        ), 200, $response); 
+    }
 
     static public function getAccepted($response, $token, $friend_id)
     {

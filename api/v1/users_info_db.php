@@ -4,7 +4,7 @@ class UsersInfoDB extends Database
 {
     static public function get($user_id, $friend_id)
     {
-        if (!($mysqli = UsersInfoDB::getConection()))
+        if (!($mysqli = UsersInfoDB::connect()))
             return false;
 
         if (!$friend_id || $user_id == $friend_id) {
@@ -133,7 +133,7 @@ class UsersInfoDB extends Database
 
     static public function update($user_id, $info)
     {
-        if (!($mysqli = UsersInfoDB::getConection()))
+        if (!($mysqli = UsersInfoDB::connect()))
             return false;
 
         $query_sql = "  UPDATE

@@ -142,6 +142,26 @@ $app->put('/user/me/info', function ($request, $response) {
 
 
 
+/* Handle get post */
+$app->get('/post/{id}', function ($request, $response, $args) {
+    $token = parseToken($request);
+    $post_id = $args['id'];
+    return Posts::get($response, $token, $post_id);
+});
+
+/* Handle delete post */
+$app->delete('/post/{id}', function ($request, $response, $args) {
+    $token = parseToken($request);
+    $post_id = $args['id'];
+    return Posts::delete($response, $token, $post_id);
+});
+
+/* Handle insert post */
+$app->post('/post/', function ($request, $response, $args) {
+    $token = parseToken($request);
+    $data = parseJsonBody($request);  
+    return Posts::create($response, $token, $data);
+});
 
 
 
@@ -152,18 +172,19 @@ $app->get('/user/me/friends/blocked', function ($request, $response) {
 });
 
 /* Handle block friend */
-$app->post('/user/me/friends/block', function ($request, $response) {
+$app->post('/user/{id:[0-9]+}/block', function ($request, $response) {
     $token = parseToken($request);
-    $data = parseJsonBody($request);    
-    return Friends::block($response, $token, $data);
+    $friend_id = $args['id'];       
+    return Friends::block($response, $token, $friend_id);
 });
 
 /* Handle unblock friend */
-$app->delete('/user/me/friends/blocked/{id:[0-9]+}', function ($request, $response) {
+$app->delete('/user/{id:[0-9]+}/block', function ($request, $response) {
     $token = parseToken($request);
-    $friend_id = $args['id'];
+    $friend_id = $args['id'];    
     return Friends::unblock($response, $token, $friend_id);
 });
+
 
 
 /* Handle get my waiting friends */
@@ -200,26 +221,7 @@ $app->get('/user/{id:[0-9]+}/friends', function ($request, $response, $args) {
 });
 
 
-/* Handle get post */
-$app->get('/post/{id}', function ($request, $response, $args) {
-    $token = parseToken($request);
-    $post_id = $args['id'];
-    return Posts::get($response, $token, $post_id);
-});
 
-/* Handle delete post */
-$app->delete('/post/{id}', function ($request, $response, $args) {
-    $token = parseToken($request);
-    $post_id = $args['id'];
-    return Posts::delete($response, $token, $post_id);
-});
-
-/* Handle insert post */
-$app->post('/post/', function ($request, $response, $args) {
-    $token = parseToken($request);
-    $data = parseJsonBody($request);  
-    return Posts::create($response, $token, $data);
-});
 
 
 $app->run();

@@ -4,7 +4,7 @@ class UsersDB extends Database
 {
     static public function create($user) 
     {
-        if (!($mysqli = UsersDB::getConection()))
+        if (!($mysqli = UsersDB::connect()))
             return false;
 
         $mysqli->autocommit(FALSE);
@@ -63,7 +63,7 @@ class UsersDB extends Database
 
     static public function auth($user)
     {
-        if (!($mysqli = UsersDB::getConection()))
+        if (!($mysqli = UsersDB::connect()))
             return false;                  
 
         $query_sql = "  SELECT 
@@ -104,7 +104,7 @@ class UsersDB extends Database
 
     static public function delete($user_id)
     {
-        if (!($mysqli = UsersDB::getConection()))
+        if (!($mysqli = UsersDB::connect()))
             return false;                  
 
         $query_sql = "  DELETE 
@@ -125,7 +125,7 @@ class UsersDB extends Database
 
     static public function duplicate($email) 
     {
-        if (!($mysqli = Database::getConection()))
+        if (!($mysqli = Database::connect()))
             return false;
 
         $query_sql = "  SELECT 

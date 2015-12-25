@@ -4,7 +4,7 @@ class Database
 {
     const ERROR_DATABASE_CONN = 1220;    
 
-    static public function getConection() 
+    static public function connect() 
     {
         $mysqli = new mysqli("localhost", "root", "root", "abouda");
         return $mysqli->connect_errno ? false: $mysqli;
