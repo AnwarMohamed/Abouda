@@ -267,7 +267,7 @@ class FriendsDB extends Database
                         INNER JOIN
                             users_info
                         ON
-                            users_info.user_id = friendships.user_id                            
+                            users_info.user_id = friendships.friend_id                            
                         LEFT JOIN 
                             pictures
                         ON 
@@ -302,7 +302,103 @@ class FriendsDB extends Database
         $mysqli->close();
 
         return $friends;        
-    }      
+    } 
+
+    static public function get($user_id, $friend_id)
+    {
+        if (!($mysqli = FriendsDB::connect()))
+            return false;
+
+        if (!$friend_id || $user_id == $friend_id) {
+           $query_sql = "   SELECT 
+                                friend_id,
+                                CONCAT(user_fname, ' ', user_lname), 
+                                friendship_timestamp,
+                                picture_path
+                            FROM 
+                                friendships
+                            INNER JOIN
+                                users_info
+                            ON
+                                users_info.user_id = friendships.friend_id                            
+                            LEFT JOIN 
+                                pictures
+                            ON 
+                                pictures.picture_id = user_thumbnail
+                            WHERE 
+                                friendships.user_id = ? 
+                            AND 
+                                friendship_type = 'accepted'";
+
+            $query = $mysqli->prepare($query_sql);
+            $query->bind_param("s", $user_id);  
+
+        } else {
+           $query_sql = "   SELECT 
+                                friend_id,
+                                CONCAT(user_fname, ' ', user_lname), 
+                                friendship_timestamp,
+                                picture_path
+                            FROM 
+                                friendships
+                            INNER JOIN
+                                users_info
+                            ON
+                                users_info.user_id = friendships.friend_id                            
+                            LEFT JOIN 
+                                pictures
+                            ON
+                                pictures.picture_id = user_thumbnail
+                            WHERE
+                                friendships.friend_id
+                            IN
+                            (
+                                SELECT 
+                                    friend_id
+                                FROM
+                                    friendships
+                                WHERE
+                                    user_id = ?
+                                AND
+                                    friendship_type = 'accepted'
+                            )
+                            AND
+                                friendships.user_id = ? 
+                            AND 
+                                friendship_type = 'accepted'";
+
+            $query = $mysqli->prepare($query_sql);
+            var_dump($mysqli->error);
+            $query->bind_param("ss", 
+                $user_id,
+                $friend_id);  
+        }
+
+        $query->bind_result(
+            $friend_id, 
+            $friend_name, 
+            $friendship_timestamp, 
+            $friend_thumbnail);
+
+        $query->execute();
+
+        $friends = array();
+
+        while($query->fetch()) {
+            $friends[]  = array(
+                'id' => $friend_id,
+                'name' => $friend_name,
+                'timestamp' => $friendship_timestamp,
+                'thumbnail' => $friend_thumbnail                
+            );
+        }
+        
+        $query->close();
+        $mysqli->close();
+
+        return $friends;   
+    }
+
 }
 
 ?>

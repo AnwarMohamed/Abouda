@@ -155,7 +155,7 @@ class Friends
         ), 200, $response); 
     }
 
-    static public function getAccepted($response, $token, $friend_id)
+    static public function get($response, $token, $friend_id)
     {
         if (!TokensDB::check($token)) {
             return putError(
@@ -163,7 +163,7 @@ class Friends
                 Users::ERROR_AUTH_INVALID, $response);            
         }
 
-        $accepted = Database::getFriends($token[Users::ID_KEY], 'accepted', $friend_id);
+        $accepted = FriendsDB::get($token[Users::ID_KEY], 'accepted', $friend_id);
 
         return putJsonBody(array(
             'error' => false,                

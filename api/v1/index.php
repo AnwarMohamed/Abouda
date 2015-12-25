@@ -172,14 +172,14 @@ $app->get('/user/me/friends/blocked', function ($request, $response) {
 });
 
 /* Handle block friend */
-$app->post('/user/{id:[0-9]+}/block', function ($request, $response) {
+$app->post('/user/{id:[0-9]+}/block', function ($request, $response, $args) {
     $token = parseToken($request);
     $friend_id = $args['id'];       
     return Friends::block($response, $token, $friend_id);
 });
 
 /* Handle unblock friend */
-$app->delete('/user/{id:[0-9]+}/block', function ($request, $response) {
+$app->delete('/user/{id:[0-9]+}/block', function ($request, $response, $args) {
     $token = parseToken($request);
     $friend_id = $args['id'];    
     return Friends::unblock($response, $token, $friend_id);
@@ -188,14 +188,14 @@ $app->delete('/user/{id:[0-9]+}/block', function ($request, $response) {
 
 
 /* Handle add friend */
-$app->post('/user/{id:[0-9]+}/request', function ($request, $response) {
+$app->post('/user/{id:[0-9]+}/request', function ($request, $response, $args) {
     $token = parseToken($request); 
     $friend_id = $args['id'];
     return Friends::request($response, $token, $friend_id);
 });
 
 /* Handle delete friend */
-$app->delete('/user/{id:[0-9]+}/request', function ($request, $response) {
+$app->delete('/user/{id:[0-9]+}/request', function ($request, $response, $args) {
     $token = parseToken($request); 
     $friend_id = $args['id'];
     return Friends::unrequest($response, $token, $friend_id);
@@ -217,22 +217,18 @@ $app->get('/user/me/friends/requested', function ($request, $response) {
 
 
 
-/* Handle get my accepted friends */
-$app->get('/user/me/friends/accepted', function ($request, $response) {
+/* Handle get my friends */
+$app->get('/user/me/friends', function ($request, $response) {
     $token = parseToken($request);    
-    return Friends::getAccepted($response, $token, null);
+    return Friends::get($response, $token, null);
 });
-
 
 /* Handle get user accepted friends */
 $app->get('/user/{id:[0-9]+}/friends', function ($request, $response, $args) {
     $token = parseToken($request);
     $friend_id = $args['id'];
-    return Friends::getAccepted($response, $token, $friend_id);
+    return Friends::get($response, $token, $friend_id);
 });
-
-
-
 
 
 $app->run();

@@ -61,7 +61,6 @@ class UsersInfoDB extends Database
                                         friendship_type = 'accepted'
                                 )
                                 
-
                                 UNION
                                 
                                 SELECT
