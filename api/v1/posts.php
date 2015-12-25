@@ -16,8 +16,8 @@ class Posts
     const ERROR_TEXT_FORMAT = 1230;
     const ERROR_PRIVACY_FORMAT = 1231;
 
-	static public function get($response, $token, $post_id)
-	{
+    static public function get($response, $token, $post_id)
+    {
         if (!TokensDB::check($token)) {
             return putError(
                 'invalid token', 
@@ -36,7 +36,28 @@ class Posts
             'error' => false,                
             'post' => $post
         ), 200, $response);   
-	}
+    }
+
+    static public function delete($response, $token, $post_id)
+    {
+        if (!TokensDB::check($token)) {
+            return putError(
+                'invalid token', 
+                Users::ERROR_AUTH_INVALID, $response);            
+        }
+        
+        $post = PostsDB::delete($token[Users::ID_KEY], $post_id);
+
+        if ($post === FALSE) {
+            return putError(
+                'database connection error', 
+                DATABASE::ERROR_DATABASE_CONN, $response);             
+        }
+
+        return putJsonBody(array(
+            'error' => false,
+        ), 200, $response);   
+    }
 
     static public function create($response, $token, $post)
     {

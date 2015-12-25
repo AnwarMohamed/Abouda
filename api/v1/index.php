@@ -207,12 +207,20 @@ $app->get('/post/{id}', function ($request, $response, $args) {
     return Posts::get($response, $token, $post_id);
 });
 
+/* Handle delete post */
+$app->delete('/post/{id}', function ($request, $response, $args) {
+    $token = parseToken($request);
+    $post_id = $args['id'];
+    return Posts::delete($response, $token, $post_id);
+});
+
 /* Handle insert post */
 $app->post('/post/', function ($request, $response, $args) {
     $token = parseToken($request);
     $data = parseJsonBody($request);  
     return Posts::create($response, $token, $data);
 });
+
 
 $app->run();
 

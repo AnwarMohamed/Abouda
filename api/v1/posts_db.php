@@ -4,7 +4,7 @@ class PostsDB extends Database
 {
     static public function get($user_id, $post_id) 
     {
-        if (!($mysqli = Database::getConection()))
+        if (!($mysqli = PostsDB::getConection()))
             return false;                 
 
         $query_sql = "  SELECT 
@@ -90,7 +90,7 @@ class PostsDB extends Database
 
     static public function getAll($user_id)
     {
-        if (!($mysqli = Database::getConection()))
+        if (!($mysqli = PostsDB::getConection()))
             return false; 
 
         $query_sql = "  SELECT 
@@ -168,7 +168,7 @@ class PostsDB extends Database
 
     static public function create($user_id, $post) 
     {
-        if (!($mysqli = Database::getConection()))
+        if (!($mysqli = PostsDB::getConection()))
             return false;                 
 
         $mysqli->autocommit(FALSE);
@@ -193,7 +193,32 @@ class PostsDB extends Database
         $mysqli->close(); 
 
         return $post;
-    }    
+    }  
+
+    static public function delete($user_id, $post_id) 
+    {
+        if (!($mysqli = PostsDB::getConection()))
+            return false;                                 
+
+        $query_sql = "  DELETE FROM 
+                            posts
+                        WHERE
+                            post_id = ?
+                        AND
+                            user_id = ?";                             
+
+        $query = $mysqli->prepare($query_sql);        
+        $query->bind_param("ss", 
+            $post_id,
+            $user_id);                     
+
+        $query->execute();        
+        $query->close();
+
+        $mysqli->close(); 
+
+        return true;
+    }        
 }
 
 ?>
