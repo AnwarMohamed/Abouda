@@ -49,7 +49,7 @@ class FriendsDB extends Database
 
     static public function blocked($user_id)
     {
-        if (!($mysqli = Database::connect()))
+        if (!($mysqli = FriendsDB::connect()))
             return false;
 
        $query_sql = "   SELECT 
@@ -183,8 +183,7 @@ class FriendsDB extends Database
                                     friend_id = ?
                             )";                            
 
-            $query = $mysqli->prepare($query_sql); 
-            var_dump($mysqli->error);                 
+            $query = $mysqli->prepare($query_sql);
             $query->bind_param("sss",
                 $user_id,
                 $friend_id,
@@ -199,7 +198,111 @@ class FriendsDB extends Database
         $mysqli->close();
 
         return true;
-    }     
+    } 
+
+    static public function requests($user_id)
+    {
+        if (!($mysqli = FriendsDB::connect()))
+            return false;
+
+       $query_sql = "   SELECT 
+                            friendships.user_id,
+                            CONCAT(user_fname, ' ', user_lname), 
+                            friendship_timestamp,
+                            picture_path
+                        FROM 
+                            friendships
+                        INNER JOIN
+                            users_info
+                        ON
+                            users_info.user_id = friendships.user_id                            
+                        LEFT JOIN 
+                            pictures
+                        ON 
+                            pictures.picture_id = user_thumbnail
+                        WHERE 
+                            friendships.friend_id = ? 
+                        AND 
+                            friendship_type = 'requested'";
+
+        $query = $mysqli->prepare($query_sql);        
+        $query->bind_param("s", $user_id);
+        $query->bind_result(
+            $friend_id, 
+            $friend_name, 
+            $friendship_timestamp, 
+            $friend_thumbnail);
+
+        $query->execute();
+
+        $friends = array();
+
+        while($query->fetch()) {
+            $friends[]  = array(
+                'id' => $friend_id,
+                'name' => $friend_name,
+                'timestamp' => $friendship_timestamp,
+                'thumbnail' => $friend_thumbnail                
+            );
+        }
+        
+        $query->close();
+        $mysqli->close();
+
+        return $friends;        
+    }
+
+    static public function requested($user_id)
+    {
+        if (!($mysqli = FriendsDB::connect()))
+            return false;
+
+       $query_sql = "   SELECT 
+                            friend_id,
+                            CONCAT(user_fname, ' ', user_lname), 
+                            friendship_timestamp,
+                            picture_path
+                        FROM 
+                            friendships
+                        INNER JOIN
+                            users_info
+                        ON
+                            users_info.user_id = friendships.user_id                            
+                        LEFT JOIN 
+                            pictures
+                        ON 
+                            pictures.picture_id = user_thumbnail
+                        WHERE 
+                            friendships.user_id = ? 
+                        AND 
+                            friendship_type = 'requested'";
+
+        $query = $mysqli->prepare($query_sql);        
+        $query->bind_param("s", $user_id);
+        $query->bind_result(
+            $friend_id, 
+            $friend_name, 
+            $friendship_timestamp, 
+            $friend_thumbnail);
+
+        $query->execute();
+
+        $friends = array();
+
+        while($query->fetch()) {
+            $friends[]  = array(
+                'id' => $friend_id,
+                'name' => $friend_name,
+                'timestamp' => $friendship_timestamp,
+                'thumbnail' => $friend_thumbnail                
+            );
+        }
+        
+        $query->close();
+        $mysqli->close();
+
+        return $friends;        
+    }      
 }
 
 ?>

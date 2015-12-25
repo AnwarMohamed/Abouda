@@ -111,6 +111,50 @@ class Friends
         ), 200, $response); 
     }
 
+    static public function requests($response, $token)
+    {
+        if (!TokensDB::check($token)) {
+            return putError(
+                'invalid token', 
+                Users::ERROR_AUTH_INVALID, $response);            
+        }
+
+        $requests = FriendsDB::requests($token[Users::ID_KEY]);
+
+        if ($requests === FALSE) {
+            return putError(
+                'database connection error', 
+                DATABASE::ERROR_DATABASE_CONN, $response);             
+        }
+
+        return putJsonBody(array(
+            'error' => false,
+            'friends' => $requests           
+        ), 200, $response); 
+    }
+
+    static public function requested($response, $token)
+    {
+        if (!TokensDB::check($token)) {
+            return putError(
+                'invalid token', 
+                Users::ERROR_AUTH_INVALID, $response);            
+        }
+
+        $requested = FriendsDB::requested($token[Users::ID_KEY]);
+
+        if ($requested === FALSE) {
+            return putError(
+                'database connection error', 
+                DATABASE::ERROR_DATABASE_CONN, $response);             
+        }
+
+        return putJsonBody(array(
+            'error' => false,
+            'friends' => $requested           
+        ), 200, $response); 
+    }
+
     static public function getAccepted($response, $token, $friend_id)
     {
         if (!TokensDB::check($token)) {

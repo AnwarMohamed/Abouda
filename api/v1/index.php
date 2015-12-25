@@ -203,10 +203,10 @@ $app->delete('/user/{id:[0-9]+}/request', function ($request, $response) {
 
 
 
-/* Handle get my waiting friends */
-$app->get('/user/me/friends/waiting', function ($request, $response) {
+/* Handle get my friend requests */
+$app->get('/user/me/friends/requests', function ($request, $response) {
     $token = parseToken($request);    
-    return Friends::waiting($response, $token);
+    return Friends::requests($response, $token);
 });
 
 /* Handle get my requested friends */
@@ -215,12 +215,7 @@ $app->get('/user/me/friends/requested', function ($request, $response) {
     return Friends::requested($response, $token);
 });
 
-/* Handle add friend */
-$app->post('/user/me/friends/request', function ($request, $response) {
-    $token = parseToken($request); 
-    $data = parseJsonBody($request);   
-    return Friends::request($response, $token, $data);
-});
+
 
 /* Handle get my accepted friends */
 $app->get('/user/me/friends/accepted', function ($request, $response) {
