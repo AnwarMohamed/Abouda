@@ -36,7 +36,7 @@ class TokensDB extends Database
         if (!$token)
             return false;
 
-        if (!($mysqli = TokensDB::getConection()))
+        if (!($mysqli = TokensDB::connect()))
             return false;       
 
         $query_sql = "  SELECT 

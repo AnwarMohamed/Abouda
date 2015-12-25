@@ -35,6 +35,27 @@ class Friends
                 Users::ERROR_AUTH_INVALID, $response);            
         }
 
+        $blocked = FriendsDB::block($token[Users::ID_KEY], $friend_id);
+
+        if ($blocked === FALSE) {
+            return putError(
+                'database connection error', 
+                DATABASE::ERROR_DATABASE_CONN, $response);             
+        }
+
+        return putJsonBody(array(
+            'error' => false            
+        ), 200, $response); 
+    }
+
+    static public function unblock($response, $token, $friend_id)
+    {
+        if (!TokensDB::check($token)) {
+            return putError(
+                'invalid token', 
+                Users::ERROR_AUTH_INVALID, $response);            
+        }
+
         $unblocked = FriendsDB::unblock($token[Users::ID_KEY], $friend_id);
 
         if ($unblocked === FALSE) {
@@ -47,6 +68,7 @@ class Friends
             'error' => false            
         ), 200, $response); 
     }
+
 
     static public function getAccepted($response, $token, $friend_id)
     {

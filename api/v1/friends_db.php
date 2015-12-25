@@ -2,65 +2,71 @@
 
 class FriendsDB extends Database
 {
-	static public function blocked($user_id, $friend_id)
-	{
+    static public function block($user_id, $friend_id)
+    {
         if (!($mysqli = FriendsDB::connect()))
             return false;
 
-       	$query_sql = "	SELECT 
-                            friend_id, 
-                            CONCAT(user_fname, ' ', user_lname), 
-                            friendship_timestamp,
-                            picture_path
-                      	FROM 
-                            friendships
-                      	INNER JOIN
-                            users_info
-                      	ON
-                            users_info.user_id = friend_id                            
-                      	LEFT JOIN 
-                            pictures
-                      	ON 
-                            pictures.picture_id = user_thumbnail
-                      	WHERE 
-                            friendships.user_id = ? 
-                       	AND 
-                       		friendship_type = 'blocked'";
+        if ($user_id != $friend_id) {
+            $query_sql = "  INSERT INTO
+                                friendships
+                            VALUES
+                                (?,?,'blocked',NOW())
+                            ON 
+                                DUPLICATE KEY 
+                            UPDATE
+                                friendship_timestamp = NOW(),
+                                friendship_type = 'blocked'";
 
-        $query = $mysqli->prepare($query_sql);        
-        $query->bind_param("s", $user_id); 
-        $query->execute();  
+            $query = $mysqli->prepare($query_sql);                 
+            $query->bind_param("s", $user_id); 
+            $query->execute();  
 
-     	$query->close();
-        $mysqli->close();
+            $query_sql = "  DELETE FROM
+                                friendships
+                            WHERE
+                                user_id = ?
+                            AND
+                                friend_id = ?";
+
+            $query = $mysqli->prepare($query_sql);                  
+            $query->bind_param("ss", 
+                $friend_id, 
+                $user_id); 
+
+            $query->execute();                         
+            $query->close();
+
+            $mysqli->close();
+        }
 
         return true;
-	}
+    }
 
-	static public function blocked($user_id)
-	{
+    static public function blocked($user_id)
+    {
         if (!($mysqli = Database::connect()))
             return false;
 
-       $query_sql = "	SELECT 
+       $query_sql = "   SELECT 
                             friend_id, 
                             CONCAT(user_fname, ' ', user_lname), 
                             friendship_timestamp,
                             picture_path
-                      	FROM 
+                        FROM 
                             friendships
-                      	INNER JOIN
+                        INNER JOIN
                             users_info
-                      	ON
+                        ON
                             users_info.user_id = friend_id                            
-                      	LEFT JOIN 
+                        LEFT JOIN 
                             pictures
-                      	ON 
+                        ON 
                             pictures.picture_id = user_thumbnail
-                      	WHERE 
+                        WHERE 
                             friendships.user_id = ? 
-                       	AND 
-                       		friendship_type = 'blocked'";
+                        AND 
+                            friendship_type = 'blocked'";
 
         $query = $mysqli->prepare($query_sql);        
         $query->bind_param("s", $user_id);
@@ -86,8 +92,37 @@ class FriendsDB extends Database
         $query->close();
         $mysqli->close();
 
-        return $friends; 		
-	}
+        return $friends;        
+    }
+
+    static public function unblock($user_id, $friend_id)
+    {
+        if (!($mysqli = FriendsDB::connect()))
+            return false;
+
+        if ($user_id != $friend_id) {
+            $query_sql = "  DELETE FROM
+                                friendships
+                            WHERE
+                                user_id = ?
+                            AND
+                                friend_id = ?
+                            AND
+                                friendship_type = 'blocked'";
+
+            $query = $mysqli->prepare($query_sql);                  
+            $query->bind_param("ss",                 
+                $user_id,
+                $friend_id); 
+
+            $query->execute();                         
+            $query->close();
+
+            $mysqli->close();
+        }
+
+        return true;
+    }    
 }
 
 ?>
