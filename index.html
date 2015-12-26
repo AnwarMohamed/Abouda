@@ -1,73 +1,98 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="AboudaApp" class="no-js">
+
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="description" content="Social Networking Portal">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Social Networking Portal">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Abouda</title>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="bower_components/html5-boilerplate/dist/css/normalize.css">
+    <link rel="stylesheet" href="bower_components/html5-boilerplate/dist/css/main.css">
+    <link rel="stylesheet" href="bower_components/jquery-ui/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="bower_components/vegas/dist/vegas.min.css">
+    <link rel="stylesheet" href="bower_components/bootstrap-select/dist/css/bootstrap-select.css">
+    <link rel="stylesheet" href="bower_components/angular-bootstrap-toggle-switch/style/bootstrap3/angular-toggle-switch-bootstrap-3.css">
+    <link rel="stylesheet" href="bower_components/ladda/dist/ladda-themeless.min.css">
+    <link rel="stylesheet" href="bower_components/angular-growl-v2/build/angular-growl.css">
+    <link rel="stylesheet" type="text/css" href="css/stylesheet.css">
+    <link rel="stylesheet" type="text/css" href="css/app.css">
+</head>
 
-  <title>Abouda</title>
+<body ng-controller="MainCtrl">
+    <div ng-show="!isActive('/')" class="jaybar">
+        <div class="jaybar-bar">
+            <a href="#{{location.path()}}" class="jaybar-menu-button"><span></span></a>
+            <img class="jaybar-avatar" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAgACADASIAAhEBAxEB/8QAFwAAAwEAAAAAAAAAAAAAAAAABQYHCP/EACsQAAICAQMCBgIBBQAAAAAAAAECAwQRBQYhABIHEzFBYXEiURRCgYKjsf/EABcBAAMBAAAAAAAAAAAAAAAAAAIDBAD/xAAbEQACAgMBAAAAAAAAAAAAAAABAgADBBESIv/aAAwDAQACEQMRAD8Are2du7fk1W6tjRdMdDWrlUaihAJebkce/aOfgdJ2/NKNW3uCvtfbely32ljSIGtCBAghGWXuHbknB+zk56ZIdXtw6zdMUNcMYK4UctgBpvTHvhj9dDbEtyXUNYngljhkVopXBjaVmUICUUZyCQByc4PUr5CnQWFSh600zJuK5uvQbcly2IoGRwOySKKQH/DBTH9utHeB40fd+2zrNzbuledasdjotNCiMkSK2ARwpZScfPv7yLdOnyalp4l1e0ZrNlTmHyRH5TE+v7znGOM9VvwnWxpWz1r0/wCJ5cU7dwUlhlkVgMqc5GQD88dZLx16lN+NyvmSLffi4zLdXbbyVpJBFCLPdiRVQs34gcDPcAfg9L20d+byta/EKT3NZbiWaqzFw8agq3efYcjDeg4+unnV/DjwykR3bVbGn9uSRXtBl/2A/wDR0J1nU9D0vSIdF2HYq1qSPHJLZmsKZrsynKhmGCQD7DAHsP2YZFXSiLWhuvRgie/b3JqLCJIKUqJ3mgGPmoCc/lnGSTyTk+oz0sVd02tp7qs3dHuulhjifB7oZSPUFf6hnODwfcfs0vfUF+KUxtbkSlMronmTFjA54Pl/GDjkA8kfPWeZFKOVY8gkH76GpULEiMyGfkBhP//Z">
+            <a class="jaybar-availability" title="Online">Online</a> 
+            <a class="jaybar-name"><strong>Anwar Mohamed</strong></a>
 
-  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
-  <link rel="stylesheet" href="bower_components/html5-boilerplate/dist/css/normalize.css">
-  <link rel="stylesheet" href="bower_components/html5-boilerplate/dist/css/main.css">
-  <link rel="stylesheet" href="bower_components/jquery-ui/themes/smoothness/jquery-ui.css">
-  <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css">
-  <link rel="stylesheet" href="bower_components/vegas/dist/vegas.min.css">
-  <link rel="stylesheet" href="bower_components/bootstrap-select/dist/css/bootstrap-select.css">  
-  <link rel="stylesheet" href="bower_components/angular-bootstrap-toggle-switch/style/bootstrap3/angular-toggle-switch-bootstrap-3.css">
-  <link rel="stylesheet" href="bower_components/ladda/dist/ladda-themeless.min.css">
-  <link rel="stylesheet" href="bower_components/angular-growl-v2/build/angular-growl.css">
+            <div class="jaybar-buttons">
+                <a class="jaybar-button-requests" href="#/requests" data-toggle="tooltip" title="Friend Requests" data-placement="bottom">                    
+                    <svg class="jaybar-icon" width="25px" height="25px" viewBox="0 0 485.211 485.21">
+                        <path d="M394.235,333.585h-30.327c-33.495,0-60.653-27.158-60.653-60.654v-19.484c13.418-15.948,23.042-34.812,29.024-54.745 c0.621-3.36,3.855-5.02,6.012-7.33c11.611-11.609,13.894-31.2,5.185-45.149c-1.186-2.117-3.322-3.953-3.201-6.576 c0-17.784,0.089-35.596-0.023-53.366c-0.476-21.455-6.608-43.773-21.65-59.66c-12.144-12.836-28.819-20.479-46.022-23.75 c-21.739-4.147-44.482-3.937-66.013,1.54c-18.659,4.709-36.189,15.637-47.028,31.836c-9.598,14.083-13.803,31.183-14.513,48.036 c-0.266,18.094-0.061,36.233-0.116,54.371c0.413,3.631-2.667,6.088-4.058,9.094c-8.203,14.881-4.592,35.155,8.589,45.978 c3.344,2.308,3.97,6.515,5.181,10.142c5.748,17.917,15.282,34.487,27.335,48.925v20.138c0,33.496-27.157,60.654-60.651,60.654 H90.978c0,0-54.964,15.158-90.978,90.975v30.327c0,16.759,13.564,30.321,30.327,30.321h424.562 c16.759,0,30.322-13.562,30.322-30.321V424.56C449.199,348.749,394.235,333.585,394.235,333.585z"/>   
+                    </svg>
+                </a>
+                <a class="jaybar-button-notifications" href="#/notifications" data-toggle="tooltip" title="Notifications" data-placement="bottom">                    
+                    <svg class="jaybar-icon" width="28px" height="28px" viewBox="0 0 535.5 535.5">
+                        <path d="M142.8,53.55l-35.7-35.7C45.9,63.75,5.1,135.15,0,216.75h51C56.1,147.9,89.25,89.25,142.8,53.55z M484.5,216.75h51 c-5.1-81.6-43.35-153-104.55-198.9l-35.7,35.7C446.25,89.25,479.4,147.9,484.5,216.75z M433.5,229.5 c0-79.05-53.55-142.8-127.5-160.65V51c0-20.4-17.85-38.25-38.25-38.25c-20.4,0-38.25,17.85-38.25,38.25v17.85 C155.55,86.7,102,150.45,102,229.5v140.25l-51,51v25.5h433.5v-25.5l-51-51V229.5z M267.75,522.75c2.55,0,7.65,0,10.2,0 c17.85-2.55,30.6-15.3,35.7-30.6c2.55-5.101,5.1-12.75,5.1-20.4h-102C216.75,499.8,239.7,522.75,267.75,522.75z"/>
+                    </svg>
+                </a>
+                <a class="jaybar-button-settings" href="#/settings" data-toggle="tooltip" title="Settings" data-placement="bottom">                    
+                    <svg class="jaybar-icon" width="28px" height="28px" viewBox="0 0 268.765 268.765">
+                        <path style="fill-rule:evenodd;clip-rule:evenodd;" d="M267.92,119.461c-0.425-3.778-4.83-6.617-8.639-6.617 c-12.315,0-23.243-7.231-27.826-18.414c-4.682-11.454-1.663-24.812,7.515-33.231c2.889-2.641,3.24-7.062,0.817-10.133 c-6.303-8.004-13.467-15.234-21.289-21.5c-3.063-2.458-7.557-2.116-10.213,0.825c-8.01,8.871-22.398,12.168-33.516,7.529 c-11.57-4.867-18.866-16.591-18.152-29.176c0.235-3.953-2.654-7.39-6.595-7.849c-10.038-1.161-20.164-1.197-30.232-0.08 c-3.896,0.43-6.785,3.786-6.654,7.689c0.438,12.461-6.946,23.98-18.401,28.672c-10.985,4.487-25.272,1.218-33.266-7.574 c-2.642-2.896-7.063-3.252-10.141-0.853c-8.054,6.319-15.379,13.555-21.74,21.493c-2.481,3.086-2.116,7.559,0.802,10.214 c9.353,8.47,12.373,21.944,7.514,33.53c-4.639,11.046-16.109,18.165-29.24,18.165c-4.261-0.137-7.296,2.723-7.762,6.597 c-1.182,10.096-1.196,20.383-0.058,30.561c0.422,3.794,4.961,6.608,8.812,6.608c11.702-0.299,22.937,6.946,27.65,18.415 c4.698,11.454,1.678,24.804-7.514,33.23c-2.875,2.641-3.24,7.055-0.817,10.126c6.244,7.953,13.409,15.19,21.259,21.508 c3.079,2.481,7.559,2.131,10.228-0.81c8.04-8.893,22.427-12.184,33.501-7.536c11.599,4.852,18.895,16.575,18.181,29.167 c-0.233,3.955,2.67,7.398,6.595,7.85c5.135,0.599,10.301,0.898,15.481,0.898c4.917,0,9.835-0.27,14.752-0.817 c3.897-0.43,6.784-3.786,6.653-7.696c-0.451-12.454,6.946-23.973,18.386-28.657c11.059-4.517,25.286-1.211,33.281,7.572 c2.657,2.89,7.047,3.239,10.142,0.848c8.039-6.304,15.349-13.534,21.74-21.494c2.48-3.079,2.13-7.559-0.803-10.213 c-9.353-8.47-12.388-21.946-7.529-33.524c4.568-10.899,15.612-18.217,27.491-18.217l1.662,0.043 c3.853,0.313,7.398-2.655,7.865-6.588C269.044,139.917,269.058,129.639,267.92,119.461z M134.595,179.491 c-24.718,0-44.824-20.106-44.824-44.824c0-24.717,20.106-44.824,44.824-44.824c24.717,0,44.823,20.107,44.823,44.824 C179.418,159.385,159.312,179.491,134.595,179.491z"/>
+                    </svg>
+                </a>
+                <a class="jaybar-button-home" href="#/home" data-toggle="tooltip" title="Home" data-placement="bottom">
+                    <svg class="jaybar-icon" width="28px" height="28px" viewBox="0 0 547.596 547.596">
+                        <path d="M540.76,254.788L294.506,38.216c-11.475-10.098-30.064-10.098-41.386,0L6.943,254.788 c-11.475,10.098-8.415,18.284,6.885,18.284h75.964v221.773c0,12.087,9.945,22.108,22.108,22.108h92.947V371.067 c0-12.087,9.945-22.108,22.109-22.108h93.865c12.239,0,22.108,9.792,22.108,22.108v145.886h92.947 c12.24,0,22.108-9.945,22.108-22.108v-221.85h75.965C549.021,272.995,552.081,264.886,540.76,254.788z"/>
+                    </svg>
+                </a>                                                
+            </div>
+        </div>
+        <ul class="jaybar-menu">
+            <li><a class="jaybar-menu-item" href="#/friends"><h3>Friends</h3><p>View your Friendlist</p></a></li>
+            <li><a class="jaybar-menu-item" href="#/search"><h3>Search</h3><p>Search for Everything</p></a></li>
+            <li><a class="jaybar-menu-item"href="#{{location.path()}}" ng-click="signout()"><h3>Sign out</h3></a></li>
+        </ul>        
+    </div>
+
+    <div growl></div>
+    <div ng-view></div>
 
     
-  <link rel="stylesheet" type="text/css" href="css/stylesheet.css">
-  <link rel="stylesheet" type="text/css" href="css/app.css">  
+    <div ng-show="!isActive('/')" class="global-brand global-brand-footer">Abouda</div>
+    
 
-</head>
-<body ng-controller="MainCtrl">
-  <header ng-show="!isActive('/')" class="global-header">
-    <nav class="navbar navbar-default navbar-sm">
-    <div class="container">
-      <ul class="nav navbar-nav" id="global-actions">
-        <li><a href="#/">Home</a></li>
-        <li><a href="#/about">About</a></li>            
-      </ul>          
-        
-    </div>
-    </nav>
-  </header>
-  
-  <div growl></div>
-  <div ng-view></div>
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/angular/angular.js"></script>    
+    <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="bower_components/angular-cookies/angular-cookies.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
+    <script src="bower_components/html5-boilerplate/dist/js/vendor/modernizr-2.8.3.min.js"></script>
+    <script src="bower_components/vegas/dist/vegas.min.js"></script>
+    <script src="bower_components/bootstrap-select/dist/js/bootstrap-select.js"></script>
+    <script src="bower_components/angular-bootstrap-toggle-switch/angular-toggle-switch.js"></script>
+    <script src="bower_components/ladda/dist/spin.min.js"></script>
+    <script src="bower_components/ladda/dist/ladda.min.js"></script>
+    <script src="bower_components/angular-ladda/dist/angular-ladda.min.js"></script>
+    <script src="bower_components/angular-growl-v2/build/angular-growl.js"></script>
+    <script src="bower_components/angular-base64/angular-base64.js"></script>
 
-  <!-- In production use:
-  <script src="//ajax.googleapis.com/ajax/libs/angularjs/x.x.x/angular.min.js"></script>
-  -->
-  <script src="bower_components/jquery/dist/jquery.js"></script>
-  <script src="bower_components/angular/angular.js"></script>
-  <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
-  <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
-  <script src="bower_components/angular-cookies/angular-cookies.js"></script>
-  <script src="bower_components/angular-route/angular-route.js"></script>
-  <script src="bower_components/html5-boilerplate/dist/js/vendor/modernizr-2.8.3.min.js"></script>
-  <script src="bower_components/vegas/dist/vegas.min.js"></script>
-  <script src="bower_components/bootstrap-select/dist/js/bootstrap-select.js"></script>
-  <script src="bower_components/angular-bootstrap-toggle-switch/angular-toggle-switch.js"></script>
 
-  <script src="bower_components/ladda/dist/spin.min.js"></script>
-  <script src="bower_components/ladda/dist/ladda.min.js"></script>
-  <script src="bower_components/angular-ladda/dist/angular-ladda.min.js"></script>
-  <script src="bower_components/angular-growl-v2/build/angular-growl.js"></script>
-  <script src="bower_components/angular-base64/angular-base64.js"></script>
+    <script src="components/version/version.js"></script>
+    <script src="components/version/version-directive.js"></script>
+    <script src="components/version/interpolate-filter.js"></script>
 
-  <script src="components/version/version.js"></script>
-  <script src="components/version/version-directive.js"></script>
-  <script src="components/version/interpolate-filter.js"></script>
+    <script src="js/app.js"></script>
 
-  <script src="js/app.js"></script>
-
-  <script src="views/signin/signin.js"></script>
-  <script src="views/profile/profile.js"></script>
-  <script src="views/home/home.js"></script>
+    <script src="views/signin/signin.js"></script>
+    <script src="views/profile/profile.js"></script>
+    <script src="views/home/home.js"></script>
+    <script src="views/search/search.js"></script>
 </body>
+
 </html>

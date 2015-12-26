@@ -16,24 +16,9 @@ angular.module('AboudaApp.signin', ['ngRoute'])
     if ($cookies.get("session_token")) {
         return $location.path('/home');
     }
-    
 
-    $("body").vegas({
-        timer: false,
-        delay: 9000,
-        transitionDuration: 5000,
-        transition: [ 'fade', 'zoomOut', 'swirlLeft' ],
-        overlay: '/abouda/bower_components/vegas/dist/overlays/01.png',
-        slides: [        
-            { src: "/abouda/img/back2.jpeg" },
-            { src: "/abouda/img/back3.jpg" },        
-            { src: "/abouda/img/back5.jpg" },
-            { src: "/abouda/img/back6.jpg" },
-            { src: "/abouda/img/back7.jpg" },
-            { src: "/abouda/img/back8.jpg" },
-            { src: "/abouda/img/back9.jpg" }
-        ]
-    });
+    $scope.signupSpinnerLabel = 'Sign up';
+    $scope.signinSpinnerLabel = 'Sign in';
 
     $scope.signin = function() {
         var data = { 
@@ -41,22 +26,27 @@ angular.module('AboudaApp.signin', ['ngRoute'])
             password: $scope.signinPassword 
         };        
 
-        $scope.signingin = true;
+        $scope.signinSpinner = true;
+        $scope.signinSpinnerLabel = 'Signing in';
 
         $http.post($scope.baseUrl + "user/me", data)
         .success(function (data, status, headers, config) { 
-            $scope.signingin = false;
+            
+            $scope.signinSpinner = false;
+            $scope.signinSpinnerLabel = 'Sign in';
 
             var id = data['result']['id'];
             var token = data['result']['token'];
             var session_token = $base64.encode(id + ':' + token);
 
-            $cookies.put("session_token", session_token);
-            $("body").vegas('destroy');
+            $cookies.put("session_token", session_token);            
             $location.path('/home');
         })
         .error(function (data, status, headers, config) {                
-            $scope.signingin = false; 
+            
+            $scope.signinSpinner = false; 
+            $scope.signinSpinnerLabel = 'Sign in';
+
             growl.error(data['msg'].capitalizeFirstLetter());        
         }); 
     };
@@ -71,22 +61,27 @@ angular.module('AboudaApp.signin', ['ngRoute'])
             password: $scope.signupPassword 
         };        
 
-        $scope.signingup = true;
+        $scope.signupSpinner = true;
+        $scope.signupSpinnerLabel = 'Signing up';
 
         $http.post($scope.baseUrl + "user/new", data)
         .success(function (data, status, headers, config) { 
-            $scope.signingup = false;
+            
+            $scope.signupSpinnerLabel = 'Sign up';
+            $scope.signupSpinner = false;
 
             var id = data['result']['id'];
             var token = data['result']['token'];
             var session_token = $base64.encode(id + ':' + token);
 
-            $cookies.put("session_token", session_token);
-            $("body").vegas('destroy');
+            $cookies.put("session_token", session_token);            
             $location.path('/home');
         })
         .error(function (data, status, headers, config) {                
-            $scope.signingup = false; 
+            
+            $scope.signupSpinner = false; 
+            $scope.signupSpinnerLabel = 'Sign up';
+            
             growl.error(data['msg'].capitalizeFirstLetter());        
         }); 
 

@@ -16,6 +16,7 @@
     "angular-bootstrap-toggle-switch": "~0.5.6",
     "angular-ladda": "~0.3.1",
     "angular-growl-v2": "angular-growl-2#~0.7.9",
-    "angular-base64": "~2.0.5"
+    "angular-base64": "~2.0.5",
+    "ngAnimate": "*"
   }
 }

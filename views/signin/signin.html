@@ -7,7 +7,7 @@
         </div>
         <div class="col-md-4">
             <div class="abouda-signin">
-                <form role="form">                    
+                <form role="form" ng-submit="signin()">                    
                     <div class="form-group input-group">
                         <span class="input-group-addon"><i class="fa fa-tag"  ></i></span>
                         <input ng-model="signinEmail" type="text" class="form-control" placeholder="Email Address" />
@@ -18,8 +18,8 @@
                     </div>                                    
 
                     <a class="btn btn-primary" data-toggle="modal" data-target="#abouda-signup-modal" style="width: 49%;" >Sign up</a>
-                    <a ng-click="signin()" class="btn btn-success pull-right ladda-button" ladda="signingin" data-style="expand-right" style="width: 49%;">
-                        <span class="ladda-label">Sign in</span>
+                    <a ng-click="signin()" class="btn btn-success pull-right ladda-button" ladda="signinSpinner" data-style="expand-right" style="width: 49%;">
+                        <span ng-bind="signinSpinnerLabel" class="ladda-label">Sign in</span>
                     </a>
                 </form>
             </div>
@@ -35,8 +35,8 @@
                     </button>
                     <h3 class="modal-title" id="modal-register-label">Sign up now</h3>                
                 </div>
-                <div class="modal-body">
-                    <form role="form" action="" method="post" class="registration-form">
+                <div class="modal-body">                    
+                    <form role="form" ng-submit="signup()" class="registration-form">
                         <div class="form-group input-group">
                             <span class="input-group-addon"><i class="fa fa-user"></i></span>
                             <input type="text" name="form-first-name" placeholder="First name" class="form-first-name form-control" ng-model="signupFname">
@@ -77,8 +77,8 @@
                             </select>
                         </div>                
                     </form>
-                    <a ng-click="signup()" class="btn btn-success ladda-button" ladda="signingup" data-style="expand-right" style="width: 100%;">
-                        <span class="ladda-label">Sign up</span>
+                    <a ng-click="signup()" class="btn btn-success ladda-button" ladda="signupSpinner" data-style="expand-right" style="width: 100%;">
+                        <span ng-bind="signupSpinnerLabel" class="ladda-label">Sign up</span>
                     </a>
                 </div>
             </div>
