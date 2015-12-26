@@ -1,18 +1,96 @@
 @font-face {
-  font-family: Cabin;
-  src: url(/fonts/Cabin-Regular.otf) format("opentype");
+  font-family: 'Cabin';
+  src: url(/abouda/fonts/Cabin-Regular.otf) format("opentype");
 }
 
 @font-face {
-  font-family: Cabin;
+  font-family: 'Cabin';
   font-weight: bold;
-  src: url(/fonts/Cabin-Bold.otf) format("opentype");
+  src: url(/abouda/fonts/Cabin-Bold.otf) format("opentype");
+}
+
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 400;
+  src: url(/abouda/fonts/Raleway-Regular.ttf);
+}
+
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 900;
+  src: url(/abouda/fonts/Raleway-Black.ttf);
 }
 
 body {
   font-family: 'Cabin', sans-serif;
   background-color: #f5f8fa!important;
 }
+
+html, body, .container-table {
+    height: 100%;
+}
+
+.container-table {
+    display: table;
+    position: absolute;
+}
+
+.vertical-center-row {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+p {
+  margin: 0px;
+  padding: 0px;
+}
+
+.global-header {
+  /*visibility: hidden;*/
+}
+
+.global-brand {  
+  font-family: 'Raleway';  
+  text-transform: uppercase;
+  vertical-align: baseline;
+  text-shadow: -1px -1px 1px rgba(0,0,0,0.3),1px 1px 1px rgba(0,0,0,0.3),0 0 10px #000;
+  letter-spacing: -6px;
+  font-size: 5em;  
+  margin: 0;
+  padding: 0;
+  color: #fff;
+  font-weight: 900;
+}
+
+.global-brand-sub {
+  letter-spacing: 0px;    
+  font-size: 2em;
+  margin: 0px 0px 20px 0px;
+  opacity: 0.7
+}
+
+.global-brand-author {      
+  letter-spacing: 0px;  
+  font-size: 1.2em;
+  padding: 0px 10px 0px 10px; 
+  background-color: black;
+  margin: 3px 0px 3px 0px;
+  color: orange;
+}
+
+.abouda-signin {
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.35);
+  padding: 10px;    
+}
+
+.abouda-signin .form-group {
+  margin-bottom: 7px;  
+}
+
+.modal .modal-dialog { width: 25%; }
 
 .navbar-default {
   background-color: white;  
@@ -69,3 +147,57 @@ body {
   height: 200px;
 }
 
+#abouda-signup-modal .modal-header {
+  background-color: #337ab7;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  padding: 8px 10px 8px 10px;
+  font-family: 'Cabin';
+  color: white;
+}
+
+#abouda-signup-modal .modal-header > h3 {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.modal.fade .modal-dialog {
+    -webkit-transform: scale(0.1);
+    -moz-transform: scale(0.1);
+    -ms-transform: scale(0.1);
+    transform: scale(0.1);
+    top: 300px;
+    opacity: 0;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+.modal.fade.in .modal-dialog {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -ms-transform: scale(1);
+    transform: scale(1);
+    -webkit-transform: translate3d(0, -300px, 0);
+    transform: translate3d(0, -300px, 0);
+    opacity: 1;
+}
+
+.modal {
+  text-align: center;
+  padding: 0!important;
+}
+
+.modal:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+  margin-right: -4px; /* Adjusts for spacing */
+}
+
+.modal-dialog {
+  display: inline-block;
+  text-align: left;
+  vertical-align: middle;
+}

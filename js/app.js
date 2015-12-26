@@ -4,22 +4,46 @@
 angular.module('AboudaApp', [
   'ngRoute',
   'ngCookies',
-  'AboudaApp.login',
+  'toggle-switch',
+  'ngSanitize',
+  'angular-ladda',
+  'angular-growl',
+  'base64',
+  'AboudaApp.signin',
   'AboudaApp.profile',
+  'AboudaApp.home',
   'AboudaApp.version'
 ])
 
 .config(['$routeProvider', function($routeProvider) {
-  $routeProvider.otherwise({redirectTo: '/login'});
+    $routeProvider.otherwise({redirectTo: '/'});
 }])
 
-.controller("MainCtrl", ['$cookies', function($cookies) {
-	console.log($cookies.get("session_token"));
+.config(['growlProvider', function(growlProvider) {
+    growlProvider.globalTimeToLive(2000);
+    growlProvider.globalDisableCountDown(true);
+    growlProvider.globalDisableCloseButton(true);
+}])
 
-	if ($cookies.get("session_token")) {
-		console.log("logged in");
+.controller("MainCtrl", ['$scope', '$cookies', '$location', 
+        function($scope, $cookies, $location) {
+        
+    $scope.baseUrl = '/abouda/api/v1/';
 
-	} else {
-		console.log("not logged");
-	}
+    $scope.isActive = function(viewLocation) {
+        return viewLocation === $location.path();
+    };
+
+    $scope.range = function(min, max, step) {
+        step = step || 1;
+        var input = [];
+        for (var i = min; i <= max; i += step) {
+            input.push(i);
+        }
+        return input;
+    };
 }]);
+
+String.prototype.capitalizeFirstLetter = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+}

@@ -1,0 +1,87 @@
+<div class="container container-table" ng-controller="SigninCtrl">
+    <div class="row vertical-center-row">
+        <div class="col-md-3"></div>
+        <div class="col-md-4">
+            <h1 class="global-brand">Abouda</h1>
+            <h3 class="global-brand global-brand-sub">A Whole new world to explore</h3>             
+        </div>
+        <div class="col-md-4">
+            <div class="abouda-signin">
+                <form role="form">                    
+                    <div class="form-group input-group">
+                        <span class="input-group-addon"><i class="fa fa-tag"  ></i></span>
+                        <input ng-model="signinEmail" type="text" class="form-control" placeholder="Email Address" />
+                    </div>
+                    <div class="form-group input-group">
+                        <span class="input-group-addon"><i class="fa fa-lock"  ></i></span>
+                        <input ng-model="signinPassword" type="password" class="form-control" placeholder="Password" />
+                    </div>                                    
+
+                    <a class="btn btn-primary" data-toggle="modal" data-target="#abouda-signup-modal" style="width: 49%;" >Sign up</a>
+                    <a ng-click="signin()" class="btn btn-success pull-right ladda-button" ladda="signingin" data-style="expand-right" style="width: 49%;">
+                        <span class="ladda-label">Sign in</span>
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="abouda-signup-modal" tabindex="-1" role="dialog" aria-labelledby="abouda-signup-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h3 class="modal-title" id="modal-register-label">Sign up now</h3>                
+                </div>
+                <div class="modal-body">
+                    <form role="form" action="" method="post" class="registration-form">
+                        <div class="form-group input-group">
+                            <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                            <input type="text" name="form-first-name" placeholder="First name" class="form-first-name form-control" ng-model="signupFname">
+                        </div>
+                        <div class="form-group input-group">
+                            <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                            <input type="text" name="form-last-name" placeholder="Last name" class="form-last-name form-control" ng-model="signupLname">
+                        </div>
+                        <div class="form-group input-group">
+                            <span class="input-group-addon"><i class="fa fa-tag"></i></span>
+                            <input type="text" name="form-email" placeholder="Email" class="form-email form-control" ng-model="signupEmail">
+                        </div>
+                        <div class="form-group input-group">
+                            <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                            <input type="password" name="form-password" placeholder="Password" class="form-first-name form-control" ng-model="signupPassword">
+                        </div>
+                        <div class="form-group">
+                            <toggle-switch 
+                                style="width: 100%"
+                                ng-model="signupGender"                            
+                                html="true"                                                        
+                                off-label="<i class='fa fa-male'></i> Male"
+                                on-label="<i class='fa fa-female'></i> Female">
+                            </toggle-switch>
+                        </div>
+                        <div class="form-group">
+                            <select class="selectpicker" data-width="100px" ng-model="signupBday">
+                              <option value="day">Day</option>
+                              <option ng-repeat="n in range(1,31)" value="{{n}}">{{n}}</option>
+                            </select>
+                            <select class="selectpicker" data-width="100px" ng-model="signupBmonth">
+                              <option value="month">Month</option>
+                              <option ng-repeat="n in ['January','February','March','April','May','June','July','August','September','October','November','December']" value="{{$index+1}}">{{n}}</option>
+                            </select>
+                            <select class="selectpicker" data-width="100px" ng-model="signupByear">
+                              <option value="year">Year</option>
+                              <option ng-repeat="n in range(1900,2015)" value="{{n}}">{{n}}</option>
+                            </select>
+                        </div>                
+                    </form>
+                    <a ng-click="signup()" class="btn btn-success ladda-button" ladda="signingup" data-style="expand-right" style="width: 100%;">
+                        <span class="ladda-label">Sign up</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>        
+</div>
