@@ -1,3 +1,43 @@
-<div class="container" ng-controller="HomeCtrl">
+<div class="container">
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">        
+            <form ng-submit="post()">
+                <div class="input-group abouda-post-bar">
+                    <input type="text" class="form-control abouda-post-text" placeholder="What's on your mind?">                    
 
+                    <div class = "input-group-btn">  
+                        <button type="button" class="btn abouda-post-image">                                
+                            <span><i class="glyphicon glyphicon-picture"></i></span>                            
+                        </button>
+                        <button type="button" class="btn btn-success dropdown-toggle" data-toggle = "dropdown" tabindex = "-1" style="border-radius: 0px !important;">                                
+                            <span><i ng-class="selectedPostPrivacy['icon']"></i><span ng-bind="selectedPostPrivacy['title']"></span></span>
+                            <span class = "caret"></span>
+                        </button>                      
+                        <ul class = "dropdown-menu">
+                            <li class="dropdown-header">Post Privacy</li>                            
+                            <li ng-repeat="postPrivacyItem in postPrivacy">
+                                <a href="#{{location.path()}}" ng-click="switchPostPrivacy(postPrivacyItem)">
+                                    <span class="glyphicon {{postPrivacyItem['icon']}}"></span>&nbsp;{{postPrivacyItem['title']}}
+                                </a>
+                            </li>                        
+                        </ul>                                           
+                        <button ng-click="post()" type="button" tabindex = "-1" class="btn btn-success ladda-button" data-style="expand-right" ladda="postSpinner" ng-click="post()">
+                            <span ng-bind="postSpinnerLabel" class="ladda-label">Post</span>
+                        </button>    
+                    </div>                                       
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3"></div>            
+        <div class="col-md-6">
+            <div class="abouda-post-bar abouda-posts-container" ng-scrollbars>
+            </div>
+        </div>
+        <div class="col-md-3"></div>          
+        </div>
+    </div>
 </div>
+

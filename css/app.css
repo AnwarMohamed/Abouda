@@ -90,12 +90,26 @@ p {
     letter-spacing: -2px;
 }
 
+.abouda-post-bar ,
 .abouda-search-bar {
     border-radius: 5px;
     background-color: rgba(255, 255, 255, 0.35);
     padding: 10px;
-    position: absolute;
+    position: relative;
     top: 5em;    
+}
+
+.abouda-posts-container {
+    top: 5.5em;    
+    position: relative;
+    overflow: hidden;    
+    height: 72vh;
+    max-height: 72vh;
+    background-color: rgba(255, 255, 255, 0.35);    
+}
+
+.abouda-post {
+    
 }
 
 .abouda-signin {
@@ -449,6 +463,26 @@ p {
     background: #000
 }
 
+.jaybar-button-notifications .badge {
+    position: relative;
+    bottom: 12px;
+    right: -10px;
+    font-family: sans-serif;
+    font-size: 7px;
+    padding: 2px;
+    background: red;
+}
+
+.jaybar-button-requests .badge {
+    position: relative;
+    bottom: 10px;
+    right: -10px;
+    font-family: sans-serif;
+    font-size: 6px;
+    padding: 2px;
+    background: red;
+}
+
 .jaybar-button-requests .jaybar-icon {
     margin-top: 1px
 }
@@ -580,3 +614,13 @@ p {
 }
 
 
+.abouda-post-image {
+    background: white;
+    border: 1px solid #ccc;
+    color: gray;
+    border-left-width: 0px;
+}
+
+.abouda-post-text {
+
+}

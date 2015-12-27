@@ -17,6 +17,9 @@
     <link rel="stylesheet" href="bower_components/angular-bootstrap-toggle-switch/style/bootstrap3/angular-toggle-switch-bootstrap-3.css">
     <link rel="stylesheet" href="bower_components/ladda/dist/ladda-themeless.min.css">
     <link rel="stylesheet" href="bower_components/angular-growl-v2/build/angular-growl.css">
+    <link rel="stylesheet" href="bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css">
+    <link rel="stylesheet" href="bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css">
+
     <link rel="stylesheet" type="text/css" href="css/stylesheet.css">
     <link rel="stylesheet" type="text/css" href="css/app.css">
 </head>
@@ -25,20 +28,22 @@
     <div ng-show="!isActive('/')" class="jaybar">
         <div class="jaybar-bar">
             <a href="#{{location.path()}}" class="jaybar-menu-button"><span></span></a>
-            <img class="jaybar-avatar" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAgACADASIAAhEBAxEB/8QAFwAAAwEAAAAAAAAAAAAAAAAABQYHCP/EACsQAAICAQMCBgIBBQAAAAAAAAECAwQRBQYhABIHEzFBYXEiURRCgYKjsf/EABcBAAMBAAAAAAAAAAAAAAAAAAIDBAD/xAAbEQACAgMBAAAAAAAAAAAAAAABAgADBBESIv/aAAwDAQACEQMRAD8Are2du7fk1W6tjRdMdDWrlUaihAJebkce/aOfgdJ2/NKNW3uCvtfbely32ljSIGtCBAghGWXuHbknB+zk56ZIdXtw6zdMUNcMYK4UctgBpvTHvhj9dDbEtyXUNYngljhkVopXBjaVmUICUUZyCQByc4PUr5CnQWFSh600zJuK5uvQbcly2IoGRwOySKKQH/DBTH9utHeB40fd+2zrNzbuledasdjotNCiMkSK2ARwpZScfPv7yLdOnyalp4l1e0ZrNlTmHyRH5TE+v7znGOM9VvwnWxpWz1r0/wCJ5cU7dwUlhlkVgMqc5GQD88dZLx16lN+NyvmSLffi4zLdXbbyVpJBFCLPdiRVQs34gcDPcAfg9L20d+byta/EKT3NZbiWaqzFw8agq3efYcjDeg4+unnV/DjwykR3bVbGn9uSRXtBl/2A/wDR0J1nU9D0vSIdF2HYq1qSPHJLZmsKZrsynKhmGCQD7DAHsP2YZFXSiLWhuvRgie/b3JqLCJIKUqJ3mgGPmoCc/lnGSTyTk+oz0sVd02tp7qs3dHuulhjifB7oZSPUFf6hnODwfcfs0vfUF+KUxtbkSlMronmTFjA54Pl/GDjkA8kfPWeZFKOVY8gkH76GpULEiMyGfkBhP//Z">
-            <a class="jaybar-availability" title="Online">Online</a> 
-            <a class="jaybar-name"><strong>Anwar Mohamed</strong></a>
+            <img class="jaybar-avatar" ng-src="{{client.myInfo['thumbnail']}}">
+            <a class="jaybar-availability" title="Online"></a> 
+            <a class="jaybar-name"><strong>{{client.myInfo['fname']}} {{client.myInfo['lname']}}</strong></a>
 
             <div class="jaybar-buttons">
-                <a class="jaybar-button-requests" href="#/requests" data-toggle="tooltip" title="Friend Requests" data-placement="bottom">                    
+                <a class="jaybar-button-requests" href="#/requests" data-toggle="tooltip" title="Friend Requests" data-placement="bottom">                     
                     <svg class="jaybar-icon" width="25px" height="25px" viewBox="0 0 485.211 485.21">
                         <path d="M394.235,333.585h-30.327c-33.495,0-60.653-27.158-60.653-60.654v-19.484c13.418-15.948,23.042-34.812,29.024-54.745 c0.621-3.36,3.855-5.02,6.012-7.33c11.611-11.609,13.894-31.2,5.185-45.149c-1.186-2.117-3.322-3.953-3.201-6.576 c0-17.784,0.089-35.596-0.023-53.366c-0.476-21.455-6.608-43.773-21.65-59.66c-12.144-12.836-28.819-20.479-46.022-23.75 c-21.739-4.147-44.482-3.937-66.013,1.54c-18.659,4.709-36.189,15.637-47.028,31.836c-9.598,14.083-13.803,31.183-14.513,48.036 c-0.266,18.094-0.061,36.233-0.116,54.371c0.413,3.631-2.667,6.088-4.058,9.094c-8.203,14.881-4.592,35.155,8.589,45.978 c3.344,2.308,3.97,6.515,5.181,10.142c5.748,17.917,15.282,34.487,27.335,48.925v20.138c0,33.496-27.157,60.654-60.651,60.654 H90.978c0,0-54.964,15.158-90.978,90.975v30.327c0,16.759,13.564,30.321,30.327,30.321h424.562 c16.759,0,30.322-13.562,30.322-30.321V424.56C449.199,348.749,394.235,333.585,394.235,333.585z"/>   
                     </svg>
+                    <span ng-show="client.unreadRequests.length != 0" class="badge">{{client.unreadRequests.length}}</span>                    
                 </a>
                 <a class="jaybar-button-notifications" href="#/notifications" data-toggle="tooltip" title="Notifications" data-placement="bottom">                    
                     <svg class="jaybar-icon" width="28px" height="28px" viewBox="0 0 535.5 535.5">
                         <path d="M142.8,53.55l-35.7-35.7C45.9,63.75,5.1,135.15,0,216.75h51C56.1,147.9,89.25,89.25,142.8,53.55z M484.5,216.75h51 c-5.1-81.6-43.35-153-104.55-198.9l-35.7,35.7C446.25,89.25,479.4,147.9,484.5,216.75z M433.5,229.5 c0-79.05-53.55-142.8-127.5-160.65V51c0-20.4-17.85-38.25-38.25-38.25c-20.4,0-38.25,17.85-38.25,38.25v17.85 C155.55,86.7,102,150.45,102,229.5v140.25l-51,51v25.5h433.5v-25.5l-51-51V229.5z M267.75,522.75c2.55,0,7.65,0,10.2,0 c17.85-2.55,30.6-15.3,35.7-30.6c2.55-5.101,5.1-12.75,5.1-20.4h-102C216.75,499.8,239.7,522.75,267.75,522.75z"/>
                     </svg>
+                    <span ng-show="client.unreadNotifications.length != 0" class="badge">{{client.unreadNotifications.length}}</span>
                 </a>
                 <a class="jaybar-button-settings" href="#/settings" data-toggle="tooltip" title="Settings" data-placement="bottom">                    
                     <svg class="jaybar-icon" width="28px" height="28px" viewBox="0 0 268.765 268.765">
@@ -67,6 +72,8 @@
     
 
     <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/moment/min/moment.min.js"></script>
+    <script src="bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
     <script src="bower_components/angular/angular.js"></script>    
     <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
     <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
@@ -81,7 +88,8 @@
     <script src="bower_components/angular-ladda/dist/angular-ladda.min.js"></script>
     <script src="bower_components/angular-growl-v2/build/angular-growl.js"></script>
     <script src="bower_components/angular-base64/angular-base64.js"></script>
-
+    <script src="bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
+    <script src="bower_components/ng-scrollbars/dist/scrollbars.min.js"></script>
 
     <script src="components/version/version.js"></script>
     <script src="components/version/version-directive.js"></script>

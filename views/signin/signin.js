@@ -10,8 +10,8 @@ angular.module('AboudaApp.signin', ['ngRoute'])
 }])
 
 .controller('SigninCtrl', [
-        '$scope', '$http', 'growl', '$base64', '$cookies', '$location',
-        function($scope, $http, growl, $base64, $cookies, $location) {
+        '$scope','growl','$cookies','$location','$rootScope','RestClient',
+        function($scope,growl,$cookies,$location,$rootScope,RestClient) {
     
     if ($cookies.get("session_token")) {
         return $location.path('/home');
@@ -21,42 +21,31 @@ angular.module('AboudaApp.signin', ['ngRoute'])
     $scope.signinSpinnerLabel = 'Sign in';
 
     $scope.signin = function() {
-        var data = { 
-            email: $scope.signinEmail, 
-            password: $scope.signinPassword 
-        };        
 
         $scope.signinSpinner = true;
         $scope.signinSpinnerLabel = 'Signing in';
 
-        $http.post($scope.baseUrl + "user/me", data)
-        .success(function (data, status, headers, config) { 
-            
+        RestClient.signinMe(
+            $scope.signinEmail, $scope.signinPassword, 
+            function (error, result) {
+
             $scope.signinSpinner = false;
             $scope.signinSpinnerLabel = 'Sign in';
 
-            var id = data['result']['id'];
-            var token = data['result']['token'];
-            var session_token = $base64.encode(id + ':' + token);
-
-            $cookies.put("session_token", session_token);            
-            $location.path('/home');
-        })
-        .error(function (data, status, headers, config) {                
-            
-            $scope.signinSpinner = false; 
-            $scope.signinSpinnerLabel = 'Sign in';
-
-            growl.error(data['msg'].capitalizeFirstLetter());        
-        }); 
+            if (!error) {
+                $location.path('/home');
+            }
+        });
     };
 
-    $scope.signup = function() {        
+    $scope.signup = function() { 
+
         var data = { 
             fname: $scope.signupFname,
             lname: $scope.signupLname,
-            gender: ($scope.signupGender ? 'female':'male'),
-            birthdate: $scope.signupByear + '-' + ("0" + $scope.signupBmonth).slice(-2) + '-' + ("0" + $scope.signupBday).slice(-2),
+            gender: 
+                ($scope.signupGender ? 'female':'male'),
+            birthdate: $('#signupBirthdate').data('date'),
             email: $scope.signupEmail, 
             password: $scope.signupPassword 
         };        
@@ -64,27 +53,16 @@ angular.module('AboudaApp.signin', ['ngRoute'])
         $scope.signupSpinner = true;
         $scope.signupSpinnerLabel = 'Signing up';
 
-        $http.post($scope.baseUrl + "user/new", data)
-        .success(function (data, status, headers, config) { 
+        RestClient.signupMe(data, 
+            function (error, result) {
             
+            $scope.signupSpinner = false;     
             $scope.signupSpinnerLabel = 'Sign up';
-            $scope.signupSpinner = false;
 
-            var id = data['result']['id'];
-            var token = data['result']['token'];
-            var session_token = $base64.encode(id + ':' + token);
-
-            $cookies.put("session_token", session_token);            
-            $location.path('/home');
-        })
-        .error(function (data, status, headers, config) {                
-            
-            $scope.signupSpinner = false; 
-            $scope.signupSpinnerLabel = 'Sign up';
-            
-            growl.error(data['msg'].capitalizeFirstLetter());        
-        }); 
-
+            if (!error) {
+                $location.path('/home');
+            }
+        });
     };  
 
 }]);

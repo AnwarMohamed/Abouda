@@ -11,14 +11,17 @@ angular.module('AboudaApp.search', ['ngRoute'])
 }])
 
 .controller('SearchCtrl', 
-		['$cookies','$location','$scope', 
-		function($cookies,$location,$scope) {
+		['$cookies','$location','$scope','$rootScope', 
+		function($cookies,$location,$scope,$rootScope) {
 
-    if (!$cookies.get("session_token")) {
+    $scope.session_token = $cookies.get("session_token");
+    
+    if (!$scope.session_token) {
         return $location.path('/');
-    }  
+    } 
 
-    $scope.searchSpinnerLabel = 'Search'; 
+    $scope.searchSpinnerLabel = 'Search';
+    $scope.searchSpinner = false;
 
     $scope.search = function() {
     	$scope.searchSpinner = true;
