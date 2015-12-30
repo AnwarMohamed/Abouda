@@ -119,7 +119,7 @@ class UsersInfoDB extends Database
                 Users::MOBILE_KEY => $user_mobile,                
                 Users::GENDER_KEY => $user_gender,
                 Users::BIRTHDATE_KEY => $user_birthdate,
-                Users::MARITAL_KEY => $user_martial,
+                Users::MARITAL_KEY => $user_marital,
                 Users::ABOUT_KEY => $user_about
             );
         }

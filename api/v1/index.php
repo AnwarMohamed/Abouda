@@ -118,16 +118,14 @@ $app->delete('/user/me', function ($request, $response) {
     return Users::delete($response, $token);
 });
 
-
-
-/* Handle get my info */
+/* Handle get user info */
 $app->get('/user/{id:[0-9]+}/info', function ($request, $response, $args) {
     $token = parseToken($request);
     $friend_id = $args['id'];
     return UsersInfo::get($response, $token, $friend_id);
 });
 
-/* Handle get user info */
+/* Handle get my info */
 $app->get('/user/me/info', function ($request, $response) {
     $token = parseToken($request);    
     return UsersInfo::get($response, $token, null);
@@ -138,6 +136,22 @@ $app->put('/user/me/info', function ($request, $response) {
     $token = parseToken($request);
     $data = parseJsonBody($request);
     return UsersInfo::update($response, $token, $data);
+});
+
+
+
+/* Handle get my posts */
+$app->get('/user/me/posts', function ($request, $response, $args) {
+    $token = parseToken($request);
+    $friend_id = $args['id'];
+    return Posts::all($response, $token, null);
+});
+
+/* Handle get user posts */
+$app->get('/user/{id:[0-9]+}/posts', function ($request, $response, $args) {
+    $token = parseToken($request);
+    $friend_id = $args['id'];
+    return Posts::all($response, $token, $friend_id);
 });
 
 
@@ -163,6 +177,12 @@ $app->post('/post/', function ($request, $response, $args) {
     return Posts::create($response, $token, $data);
 });
 
+
+/* Handle get home posts */
+$app->get('/post/', function ($request, $response) {
+    $token = parseToken($request);    
+    return Posts::home($response, $token);
+});
 
 
 /* Handle get my blocked friends */

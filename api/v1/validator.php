@@ -105,7 +105,15 @@ class Validator
             return trim($data[$key]);
 
         return null;
-    }        
+    }   
+
+    static public function filterPicture($data, $key) 
+    {        
+        if (!isset($data[$key]))
+            return false;            
+
+        return $data[$key];
+    }           
 }
 
 ?>

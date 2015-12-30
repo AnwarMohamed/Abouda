@@ -90,26 +90,13 @@ p {
     letter-spacing: -2px;
 }
 
-.abouda-post-bar ,
+.abouda-post-bar,
 .abouda-search-bar {
     border-radius: 5px;
     background-color: rgba(255, 255, 255, 0.35);
     padding: 10px;
     position: relative;
-    top: 5em;    
-}
-
-.abouda-posts-container {
-    top: 5.5em;    
-    position: relative;
-    overflow: hidden;    
-    height: 72vh;
-    max-height: 72vh;
-    background-color: rgba(255, 255, 255, 0.35);    
-}
-
-.abouda-post {
-    
+    top: 5em;
 }
 
 .abouda-signin {
@@ -252,7 +239,7 @@ p {
     top: 2em;
     left: 2em;
     min-width: 350px;
-    width: 350px;
+    /*width: 350px;*/
 }
 
 @media (max-width: 768px) {
@@ -613,7 +600,6 @@ p {
     transform: translateX(0)
 }
 
-
 .abouda-post-image {
     background: white;
     border: 1px solid #ccc;
@@ -621,6 +607,108 @@ p {
     border-left-width: 0px;
 }
 
-.abouda-post-text {
+.abouda-post {
+    padding: 0px;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.60);
+    margin-bottom: 8px;    
+}
 
+.abouda-post-privacy {
+    float: right;
+    padding-right: 10px;
+    color: #555;
+}
+
+.abouda-post-likecomment {
+    margin-top: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 5px;        
+}
+
+.abouda-post-likecomment a {
+    color: #555;
+}
+
+.abouda-post-likecomment .fa:hover {
+    color: #b80000 ;
+    text-decoration: none;
+}
+
+.abouda-post-timestamp {
+    font-family: sans-serif;
+    font-size: 6px;
+    color: #555;
+    float: right;
+}
+
+.abouda-post-picture {
+    margin-top: 5px;
+    max-width: 484px;
+    max-height: 484px;
+    width: auto;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;    
+}
+
+.abouda-post-content {
+    margin-top: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 15px;
+}
+
+.abouda-post-author {
+    padding-left: 10px;
+    padding-top: 5px;
+    line-height: 2;
+}
+
+.abouda-post-author > a {
+    color: #555;
+    font-weight: 900;
+    font-size: 14px;
+    font-family: sans-serif;
+}
+
+.abouda-post-author-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 2px;
+    border: 1px solid gray;
+    vertical-align: middle;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.abouda-posts-container {
+    top: 5.5em;
+    overflow: hidden;
+    height: 72vh;
+    max-height: 72vh;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.35);
+}
+
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    background: red;
+    cursor: inherit;
+    display: block;
 }

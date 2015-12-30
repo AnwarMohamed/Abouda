@@ -5,7 +5,7 @@
   "homepage": "https://github.com/AnwarMohamed/Abouda",
   "private": true,
   "dependencies": {
-    "angular": "~1.4.0",
+    "angular": "angularjs#~1.4.8",
     "angular-route": "~1.4.0",
     "angular-loader": "~1.4.0",
     "angular-mocks": "~1.4.0",
@@ -19,6 +19,14 @@
     "angular-base64": "~2.0.5",
     "ngAnimate": "*",
     "eonasdan-bootstrap-datetimepicker": "~4.17.37",
-    "ng-scrollbars": "~0.0.5"
+    "ng-scrollbars": "~0.0.5",
+    "ng-file-model": "*",
+    "moment": "~2.10.6",
+    "angular-moment": "~0.10.3",
+    "ngEmbed": "ng-embed#~2.0.3",
+    "angular-highlightjs": "~0.5.1"
+  },
+  "resolutions": {
+    "angular": "1.4.8"
   }
 }

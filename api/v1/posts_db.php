@@ -4,27 +4,32 @@ class PostsDB extends Database
 {
     static public function get($user_id, $post_id) 
     {
-        if (!($mysqli = PostsDB::getConection()))
+        if (!($mysqli = PostsDB::connect()))
             return false;                 
 
         $query_sql = "  SELECT 
                             post_id, 
                             posts.user_id,
-                            concat(user_fname, ' ', user_lname),                            
+                            concat(user_fname, ' ', user_lname),  
+                            up.picture_path,                          
                             post_privacy, 
                             post_timestamp, 
                             post_text, 
-                            picture_path
+                            pp.picture_path
                         FROM 
                             posts 
                         LEFT JOIN 
-                            pictures 
+                            pictures as pp
                         ON 
-                            picture_id = post_picture
+                            pp.picture_id = post_picture 
                         LEFT JOIN
                             users_info
                         ON
-                            posts.user_id = users_info.user_id
+                            posts.user_id = users_info.user_id                            
+                        LEFT JOIN 
+                            pictures as up
+                        ON 
+                            up.picture_id = users_info.user_thumbnail
                         WHERE
                             post_id
                         IN  
@@ -34,7 +39,9 @@ class PostsDB extends Database
                             FROM
                                 posts
                             WHERE
-                                post_privacy=0 OR user_id = ?
+                                post_privacy=0 
+                            OR 
+                                user_id = ?
                                          
                             UNION 
                             
@@ -57,9 +64,10 @@ class PostsDB extends Database
             $post_id); 
 
         $query->bind_result(
-            $post_id,
-            $post_user_id, 
+            $post_id, 
+            $post_user_id,
             $post_user_name,
+            $post_user_thumbnail,
             $post_privacy, 
             $post_timestamp, 
             $post_text, 
@@ -74,6 +82,7 @@ class PostsDB extends Database
                 Posts::ID_KEY => $post_id,
                 Posts::USER_ID_KEY => $post_user_id,
                 Posts::USER_NAME_KEY => $post_user_name,
+                Posts::USER_THUMBNAIL_KEY => $post_user_thumbnail,
                 Posts::PRIVACY_PUBLIC_KEY => $post_privacy,
                 Posts::TIMESTAMP_KEY => $post_timestamp,
                 Posts::TEXT_KEY => $post_text,
@@ -87,59 +96,73 @@ class PostsDB extends Database
         return $post;
     }
 
-    static public function getAll($user_id)
+    static public function home($user_id)
     {
-        if (!($mysqli = PostsDB::getConection()))
+        if (!($mysqli = PostsDB::connect()))
             return false; 
 
         $query_sql = "  SELECT 
                             post_id, 
-                            user_id,
+                            posts.user_id,
+                            concat(user_fname, ' ', user_lname), 
+                            up.picture_path,
                             post_privacy, 
                             post_timestamp, 
                             post_text, 
-                            picture_path
+                            pp.picture_path
                         FROM 
                             posts 
-                        INNER JOIN 
-                            pictures 
+                        LEFT JOIN 
+                            pictures as pp
                         ON 
-                            picture_id = post_picture 
+                            pp.picture_id = post_picture 
+                        LEFT JOIN
+                            users_info
+                        ON
+                            posts.user_id = users_info.user_id                            
+                        LEFT JOIN 
+                            pictures as up
+                        ON 
+                            up.picture_id = users_info.user_thumbnail                            
                         WHERE
                             post_id
                         IN  
-                        (
-                            (
-                                SELECT 
-                                    post_id
-                                FROM
-                                    posts
-                                WHERE
-                                    post_privacy=0
-                            ) 
-                            UNION 
-                            (
-                                SELECT 
-                                    post_id
-                                FROM
-                                    friendships
-                                INNER JOIN
-                                    posts
-                                ON
-                                    friendships.friend_id = posts.user_id AND
-                                    friendships.user_id = ?                             
-                            )
+                        (                            
+                            SELECT 
+                                post_id
+                            FROM
+                                posts
+                            WHERE
+                                post_privacy = 0
+                            OR
+                                user_id = ?
                             
-                        ) AND post_id = ?";
+                            UNION 
+                            
+                            SELECT 
+                                post_id
+                            FROM
+                                friendships
+                            INNER JOIN
+                                posts
+                            ON
+                                friendships.friend_id = posts.user_id 
+                            AND
+                                friendships.friendship_type = 'accepted'
+                            AND                                    
+                                friendships.user_id = ?                                                                                    
+                        )
+                        ORDER BY
+                            post_timestamp DESC";
 
-        $query = $mysqli->prepare($query_sql);
-        $query->bind_param("ss",            
-            $user_id,           
-            $post_id);
+        $query = $mysqli->prepare($query_sql);        
+        $query->bind_param("ss", $user_id, $user_id);
 
         $query->bind_result(
             $post_id, 
             $post_user_id,
+            $post_user_name,
+            $post_user_thumbnail,
             $post_privacy, 
             $post_timestamp, 
             $post_text, 
@@ -155,7 +178,10 @@ class PostsDB extends Database
                 Posts::PRIVACY_PUBLIC_KEY => $post_privacy,
                 Posts::TIMESTAMP_KEY => $post_timestamp,
                 Posts::TEXT_KEY => $post_text,
-                Posts::PICTURE_KEY => $post_picture
+                Posts::PICTURE_KEY => $post_picture,
+                Posts::USER_ID_KEY => $post_user_id,
+                Posts::USER_NAME_KEY => $post_user_name,
+                Posts::USER_THUMBNAIL_KEY => $post_user_thumbnail
             );
         }
         
@@ -167,21 +193,66 @@ class PostsDB extends Database
 
     static public function create($user_id, $post) 
     {
-        if (!($mysqli = PostsDB::getConection()))
+        if (!($mysqli = PostsDB::connect()))
             return false;                 
 
-        $mysqli->autocommit(FALSE);
+        $mysqli->autocommit(FALSE);        
 
-        $query_sql = "  INSERT INTO 
-                            posts
-                        VALUES 
-                            (default,?,?,NOW(),?,default)";
+        if (isset($post[Posts::PICTURE_KEY]['name'])) {                    
 
-        $query = $mysqli->prepare($query_sql);
-        $query->bind_param("sss", 
-            $user_id, 
-            $post[Posts::PRIVACY_KEY],            
-            $post[Posts::TEXT_KEY]);   
+            $picture_path = sha1(
+                $post[Posts::PICTURE_KEY]['name'].
+                $post[Posts::PICTURE_KEY]['lastModified'].
+                $post[Posts::PICTURE_KEY]['size']);
+
+            $picture_data = $post[Posts::PICTURE_KEY]['data'];
+            $picture_data = str_replace('data:image/png;base64,', '', $picture_data);
+            $picture_data = str_replace(' ', '+', $picture_data);
+
+            $picture_data = base64_decode($picture_data);
+
+            $picture_full_path = '../../uploads/' . $picture_path;
+            
+            file_put_contents($picture_full_path, $picture_data);
+
+            $query_sql = "  INSERT INTO 
+                                pictures
+                            VALUES 
+                                (default,?)";
+
+            $query = $mysqli->prepare($query_sql);
+            $query->bind_param("s", $picture_path);   
+
+            $query->execute();        
+            $query->close();
+
+            $picture_id = strval($mysqli->insert_id);
+
+            $query_sql = "  INSERT INTO 
+                                posts
+                            VALUES 
+                                (default,?,?,NOW(),?,?)";
+
+            $query = $mysqli->prepare($query_sql);
+            $query->bind_param("ssss", 
+                $user_id, 
+                $post[Posts::PRIVACY_KEY],            
+                $post[Posts::TEXT_KEY],
+                $picture_id);              
+
+        } else {
+
+            $query_sql = "  INSERT INTO 
+                                posts
+                            VALUES 
+                                (default,?,?,NOW(),?,default)";
+
+            $query = $mysqli->prepare($query_sql);
+            $query->bind_param("sss", 
+                $user_id, 
+                $post[Posts::PRIVACY_KEY],            
+                $post[Posts::TEXT_KEY]);              
+        }        
 
         $query->execute();        
         $query->close();
@@ -196,7 +267,7 @@ class PostsDB extends Database
 
     static public function delete($user_id, $post_id) 
     {
-        if (!($mysqli = PostsDB::getConection()))
+        if (!($mysqli = PostsDB::connect()))
             return false;                                 
 
         $query_sql = "  DELETE FROM 

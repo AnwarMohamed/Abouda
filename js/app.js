@@ -1,18 +1,26 @@
 'use strict';
 
-String.prototype.capitalizeFirstLetter = function() {
-    return this.charAt(0).toUpperCase() + this.slice(1);
+function toTitleCase(str) {
+    if (!str) 
+        return '';
+
+    return str.replace(/\w\S*/g, function(txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
 }
 
 angular.module('AboudaApp', [
     'ngRoute',
-    'ngCookies',
+    'ngCookies',    
     'toggle-switch',
     'ngSanitize',
     'angular-ladda',
+    'ngEmbed',
     'ngScrollbars',
+    'angularMoment',
     'angular-growl',
     'base64',    
+    'ng-file-model',
     'AboudaApp.signin',
     'AboudaApp.profile',
     'AboudaApp.home',
@@ -34,8 +42,9 @@ angular.module('AboudaApp', [
         },
         scrollInertia: 400,
         axis: 'y',
-        theme: 'light',
-        autoHideScrollbar: true
+        theme: 'minimal',
+        autoHideScrollbar: true,
+        scrollbarPosition: "outside"
     };
 })
 
@@ -59,6 +68,9 @@ angular.module('AboudaApp', [
     this.sessionToken = null;    
     this.myInfo = {};
 
+    this.homePosts = {};
+    this.myPosts = [];
+
     this.unreadRequests = [];
     this.unreadNotifications = [];
 
@@ -80,7 +92,9 @@ angular.module('AboudaApp', [
             }
         })        
         .error(function (data, status, headers, config) {                            
-            growl.error(data['msg'].capitalizeFirstLetter());
+            if (data) {                  
+                growl.error(toTitleCase(data['msg']));
+            }            
 
             if (callback) {
                 callback(true, data);
@@ -104,7 +118,9 @@ angular.module('AboudaApp', [
             }
         })
         .error(function (data, status, headers, config) {                
-            growl.error(data['msg'].capitalizeFirstLetter());
+            if (data) {                     
+                growl.error(toTitleCase(data['msg']));
+            }            
 
             if (callback) {
                 callback(true, data);       
@@ -137,13 +153,62 @@ angular.module('AboudaApp', [
             }
         })
         .error(function (data, status, headers, config) {
-            growl.error(data['msg'].capitalizeFirstLetter());  
+            if (data) {                   
+                growl.error(toTitleCase(data['msg']));
+            }            
 
             if (callback) {
                 callback(true, data);       
             }
         });  
     }
+
+    this.postMe = function(postData, callback) {
+
+        $http.post(baseUrl + "post/", postData, {
+            headers: { 'Abouda-Token': instance.sessionToken }
+        })
+        .success(function (data, status, headers, config) {        
+
+            if (callback) {
+                callback(false, data);  
+            }
+        })
+        .error(function (data, status, headers, config) {                
+            if (data) {                    
+                growl.error(toTitleCase(data['msg']));
+            }            
+
+            if (callback) {
+                callback(true, data);       
+            }
+        });   
+    }   
+
+    this.getHome = function(callback) {
+
+        $http.get(baseUrl + "post/", {
+            headers: { 'Abouda-Token': instance.sessionToken }
+        })
+        .success(function (data, status, headers, config) {        
+
+            instance.homePosts = data['posts'];
+
+            if (callback) {
+                callback(false, instance.homePosts);  
+            }
+        })
+        .error(function (data, status, headers, config) {
+            
+            if (data) {                
+                growl.error(toTitleCase(data['msg']));
+            }
+
+            if (callback) {
+                callback(true, data);       
+            }
+        });   
+    }        
 }])
 
 .controller("MainCtrl", 
