@@ -1,12 +1,13 @@
 <?php
 require 'plugins/vendor/autoload.php';
+
+$debug_mode = false;
+
 require 'database.php';
 require 'users.php';
 require 'users_info.php';
 require 'posts.php';
 require 'friends.php';
-
-$debug_mode = false;
 
 $container = new \Slim\Container();
 $container['notFoundHandler'] = function ($container) {
@@ -97,8 +98,6 @@ function putError($body, $code, $response) {
         'msg'   => $body
     ), 400, $response);    
 }
-
-
 
 /* Handle new user */
 $app->post('/user/new', function ($request, $response) {
@@ -211,6 +210,7 @@ $app->delete('/user/{id:[0-9]+}/block', function ($request, $response, $args) {
 $app->post('/user/{id:[0-9]+}/request', function ($request, $response, $args) {
     $token = parseToken($request); 
     $friend_id = $args['id'];
+
     return Friends::request($response, $token, $friend_id);
 });
 
@@ -250,6 +250,21 @@ $app->get('/user/{id:[0-9]+}/friends', function ($request, $response, $args) {
     return Friends::get($response, $token, $friend_id);
 });
 
+
+
+/* Handle like post */
+$app->put('/post/{id}/like', function ($request, $response, $args) {
+    $token = parseToken($request);
+    $post_id = $args['id'];    
+    return Posts::like($response, $token, $post_id);
+});
+
+/* Handle dislike post */
+$app->delete('/post/{id}/like', function ($request, $response, $args) {
+    $token = parseToken($request);
+    $post_id = $args['id'];
+    return Posts::dislike($response, $token, $post_id);
+});
 
 $app->run();
 

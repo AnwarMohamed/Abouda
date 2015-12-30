@@ -40,7 +40,7 @@ angular.module('AboudaApp', [
             scrollAmount: 'auto',
             enable: false
         },
-        scrollInertia: 400,
+        scrollInertia: 200,
         axis: 'y',
         theme: 'minimal',
         autoHideScrollbar: true,
@@ -141,13 +141,6 @@ angular.module('AboudaApp', [
             else
                 instance.myInfo['gender'] = 'female';
 
-            if(!instance.myInfo['thumbnail']) {
-                if (instance.myInfo['gender'] == 'male')
-                    instance.myInfo['thumbnail'] = 'img/male.jpg'
-                else if (instance.myInfo['gender'] == 'female')
-                    instance.myInfo['thumbnail'] = 'img/female.jpg'
-            }
-
             if (callback) {
                 callback(false, instance.myInfo); 
             }
@@ -209,6 +202,50 @@ angular.module('AboudaApp', [
             }
         });   
     }        
+
+    this.likePost = function(postId, callback) {
+
+        $http.put(baseUrl + "post/" + postId + "/like", null, {
+            headers: { 'Abouda-Token': instance.sessionToken }
+        })
+        .success(function (data, status, headers, config) {        
+            if (callback) {
+                callback(false, data);  
+            }
+        })
+        .error(function (data, status, headers, config) {
+            
+            if (data) {                
+                growl.error(toTitleCase(data['msg']));
+            }
+
+            if (callback) {
+                callback(true, data);       
+            }
+        });   
+    }   
+
+    this.dislikePost = function(postId, callback) {
+
+        $http.delete(baseUrl + "post/" + postId + "/like", {
+            headers: { 'Abouda-Token': instance.sessionToken }
+        })
+        .success(function (data, status, headers, config) {        
+            if (callback) {
+                callback(false, data);  
+            }
+        })
+        .error(function (data, status, headers, config) {
+            
+            if (data) {                
+                growl.error(toTitleCase(data['msg']));
+            }
+
+            if (callback) {
+                callback(true, data);       
+            }
+        });   
+    }             
 }])
 
 .controller("MainCtrl", 

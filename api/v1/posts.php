@@ -2,6 +2,7 @@
 
 require 'posts_db.php';
 
+
 class Posts 
 {
     const ID_KEY = 'id';
@@ -13,6 +14,10 @@ class Posts
     const TIMESTAMP_KEY = 'timestamp';
     const TEXT_KEY = 'text';
     const PICTURE_KEY = 'picture';
+
+    const COMMENTS_COUNT_KEY = 'comments_count';
+    const LIKES_COUNT_KEY = 'likes_count';
+    const LIKED_KEY = 'liked';
 
     const ERROR_TEXT_FORMAT = 1230;
     const ERROR_PRIVACY_FORMAT = 1231;
@@ -153,6 +158,48 @@ class Posts
             'posts' => $posts
         ), 200, $response);              
     }
+
+    static public function like($response, $token, $post_id) 
+    {
+        if (!TokensDB::check($token)) {
+            return putError(
+                'invalid token', 
+                Users::ERROR_AUTH_INVALID, $response);            
+        }   
+        
+        $result = PostsDB::like($token[Users::ID_KEY], $post_id);
+
+        if ($result === FALSE) {
+            return putError(
+                'database connection error', 
+                DATABASE::ERROR_DATABASE_CONN, $response);             
+        }
+
+        return putJsonBody(array(
+            'error' => false,                            
+        ), 200, $response);   
+    }
+
+    static public function dislike($response, $token, $post_id) 
+    {
+        if (!TokensDB::check($token)) {
+            return putError(
+                'invalid token', 
+                Users::ERROR_AUTH_INVALID, $response);            
+        }   
+        
+        $result = PostsDB::dislike($token[Users::ID_KEY], $post_id);
+
+        if ($result === FALSE) {
+            return putError(
+                'database connection error', 
+                DATABASE::ERROR_DATABASE_CONN, $response);             
+        }
+
+        return putJsonBody(array(
+            'error' => false,                            
+        ), 200, $response);   
+    }    
 }
 
 ?>

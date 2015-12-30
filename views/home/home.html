@@ -55,17 +55,26 @@
                             </div>
                             
                             <div class="abouda-post-content">
-                                <ng-embed embed-data="post['text']" embed-options="embedPostOptions"></ng-embed>
-                                <!--<span ng-bind="post['text']"></span>-->
+                                <ng-embed embed-data="post['text']" embed-options="embedPostOptions"></ng-embed>                                
                             </div>
 
                             <div ng-show="post['picture'] != null">
-                                <img class="abouda-post-picture" ng-src="{{post['picture'] ? 'img/' + post['picture'] : null}}">
+                                <img class="abouda-post-picture" ng-src="{{post['picture'] ? 'uploads/' + post['picture'] : null}}">
                             </div>
 
                             <div class="abouda-post-likecomment">
-                                <span><a href="#{{location.path()}}">6</a>&nbsp;<a href="#{{location.path()}}"><i class="fa fa-heart">&nbsp;</i></a></span>
-                                <span><a href="#{{location.path()}}">6</a>&nbsp;<a href="#{{location.path()}}"><i class="fa fa-comments-o">&nbsp;</i></a></span>
+                                <span>
+                                    <a ng-show="post['likes_count'] != 0" href="#{{location.path()}}" ng-bind="post['likes_count']"></a>
+                                    <span ng-show="post['likes_count'] != 0">&nbsp;</span>
+                                    <a href="#{{location.path()}}" ng-click="like(post['id'], $index)" ng-style="{color: post['liked'] ? '#b80000':'#555'}"><i class="fa fa-heart">&nbsp;</i></a>
+                                </span>
+                                <!--
+                                <span>
+                                    <a ng-show="post['comments_count'] != 0" href="#{{location.path()}}" ng-bind="post['comments_count']"></a>
+                                    <span ng-show="post['comments_count'] != 0">&nbsp;</span>
+                                    <a href="#{{location.path()}}"><i class="fa fa-comments-o"></i></a>
+                                </span>
+                                -->
                             </div>
 
                         </div>                        

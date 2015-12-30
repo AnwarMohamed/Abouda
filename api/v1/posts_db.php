@@ -8,7 +8,7 @@ class PostsDB extends Database
             return false;                 
 
         $query_sql = "  SELECT 
-                            post_id, 
+                            posts.post_id, 
                             posts.user_id,
                             concat(user_fname, ' ', user_lname),  
                             up.picture_path,                          
@@ -29,9 +29,10 @@ class PostsDB extends Database
                         LEFT JOIN 
                             pictures as up
                         ON 
-                            up.picture_id = users_info.user_thumbnail
+                            up.picture_id = users_info.user_thumbnail                    
+
                         WHERE
-                            post_id
+                            posts.post_id
                         IN  
                         (                            
                             SELECT 
@@ -39,7 +40,7 @@ class PostsDB extends Database
                             FROM
                                 posts
                             WHERE
-                                post_privacy=0 
+                                post_privacy=1 
                             OR 
                                 user_id = ?
                                          
@@ -55,7 +56,9 @@ class PostsDB extends Database
                                 friendships.friend_id = posts.user_id AND
                                 friendships.user_id = ?
 
-                        ) AND post_id = ?";
+                        ) 
+                        AND 
+                            post_id = ?";
 
         $query = $mysqli->prepare($query_sql);        
         $query->bind_param("sss",            
@@ -75,10 +78,10 @@ class PostsDB extends Database
 
         $query->execute();
 
-        $post = array();
+        $posts = array();
 
         while($query->fetch()) {
-            $post  = array(
+            $posts  = array(
                 Posts::ID_KEY => $post_id,
                 Posts::USER_ID_KEY => $post_user_id,
                 Posts::USER_NAME_KEY => $post_user_name,
@@ -91,9 +94,76 @@ class PostsDB extends Database
         }
         
         $query->close();
+
+        foreach ($posts as &$post) {
+            $query_sql = "  SELECT 
+                                count(comment_id)
+                            FROM
+                                comments
+                            WHERE
+                                post_id = ?";
+
+            $query = $mysqli->prepare($query_sql);        
+            $query->bind_param("s", $post[Posts::ID_KEY]);
+            $query->bind_result($post_comments_count);
+
+            $query->execute();
+            
+            while($query->fetch()) {
+                $post[Posts::COMMENTS_COUNT_KEY] = $post_comments_count;
+            }
+            
+            $query->close();
+
+            $query_sql = "  SELECT 
+                                count(user_id)
+                            FROM
+                                likes
+                            WHERE
+                                post_id = ?";
+
+            $query = $mysqli->prepare($query_sql);        
+            $query->bind_param("s", $post[Posts::ID_KEY]);
+            $query->bind_result($post_likes_count);
+
+            $query->execute();
+            
+            while($query->fetch()) {
+                $post[Posts::LIKES_COUNT_KEY] = $post_likes_count;
+            }
+            
+            $query->close(); 
+
+            $query_sql = "  SELECT 
+                                count(user_id)
+                            FROM
+                                likes
+                            WHERE
+                                post_id = ?
+                            AND
+                                user_id = ?";
+
+            $query = $mysqli->prepare($query_sql);        
+            $query->bind_param("ss", 
+                $post[Posts::ID_KEY],
+                $user_id);
+
+            $query->bind_result($post_liked);
+
+            $query->execute();
+            
+            while($query->fetch()) {
+                $post[Posts::LIKED_KEY] = $post_liked;
+            }
+            
+            $query->close();                         
+        }
+
+        unset($post);
+
         $mysqli->close();
 
-        return $post;
+        return $posts;
     }
 
     static public function home($user_id)
@@ -102,14 +172,14 @@ class PostsDB extends Database
             return false; 
 
         $query_sql = "  SELECT 
-                            post_id, 
+                            posts.post_id, 
                             posts.user_id,
                             concat(user_fname, ' ', user_lname), 
                             up.picture_path,
                             post_privacy, 
                             post_timestamp, 
                             post_text, 
-                            pp.picture_path
+                            pp.picture_path                       
                         FROM 
                             posts 
                         LEFT JOIN 
@@ -123,9 +193,10 @@ class PostsDB extends Database
                         LEFT JOIN 
                             pictures as up
                         ON 
-                            up.picture_id = users_info.user_thumbnail                            
+                            up.picture_id = users_info.user_thumbnail 
+
                         WHERE
-                            post_id
+                            posts.post_id
                         IN  
                         (                            
                             SELECT 
@@ -133,7 +204,7 @@ class PostsDB extends Database
                             FROM
                                 posts
                             WHERE
-                                post_privacy = 0
+                                post_privacy = 1
                             OR
                                 user_id = ?
                             
@@ -186,6 +257,73 @@ class PostsDB extends Database
         }
         
         $query->close();
+
+        foreach ($posts as &$post) {
+            $query_sql = "  SELECT 
+                                count(comment_id)
+                            FROM
+                                comments
+                            WHERE
+                                post_id = ?";
+
+            $query = $mysqli->prepare($query_sql);        
+            $query->bind_param("s", $post[Posts::ID_KEY]);
+            $query->bind_result($post_comments_count);
+
+            $query->execute();
+            
+            while($query->fetch()) {
+                $post[Posts::COMMENTS_COUNT_KEY] = $post_comments_count;
+            }
+            
+            $query->close();
+
+            $query_sql = "  SELECT 
+                                count(user_id)
+                            FROM
+                                likes
+                            WHERE
+                                post_id = ?";
+
+            $query = $mysqli->prepare($query_sql);        
+            $query->bind_param("s", $post[Posts::ID_KEY]);
+            $query->bind_result($post_likes_count);
+
+            $query->execute();
+            
+            while($query->fetch()) {
+                $post[Posts::LIKES_COUNT_KEY] = $post_likes_count;
+            }
+            
+            $query->close();     
+
+            $query_sql = "  SELECT 
+                                count(user_id)
+                            FROM
+                                likes
+                            WHERE
+                                post_id = ?
+                            AND
+                                user_id = ?";
+
+            $query = $mysqli->prepare($query_sql);        
+            $query->bind_param("ss", 
+                $post[Posts::ID_KEY],
+                $user_id);
+
+            $query->bind_result($post_liked);
+
+            $query->execute();
+            
+            while($query->fetch()) {
+                $post[Posts::LIKED_KEY] = $post_liked;
+            }
+            
+            $query->close();                     
+        }
+
+        unset($post);
+
         $mysqli->close();
 
         return $posts;
@@ -202,7 +340,6 @@ class PostsDB extends Database
 
             $picture_path = sha1(
                 $post[Posts::PICTURE_KEY]['name'].
-                $post[Posts::PICTURE_KEY]['lastModified'].
                 $post[Posts::PICTURE_KEY]['size']);
 
             $picture_data = $post[Posts::PICTURE_KEY]['data'];
@@ -213,32 +350,35 @@ class PostsDB extends Database
 
             $picture_full_path = '../../uploads/' . $picture_path;
             
-            file_put_contents($picture_full_path, $picture_data);
+            if (file_put_contents($picture_full_path, $picture_data)) {
+                $query_sql = "  INSERT INTO 
+                                    pictures
+                                VALUES 
+                                    (default,?)";
 
-            $query_sql = "  INSERT INTO 
-                                pictures
-                            VALUES 
-                                (default,?)";
+                $query = $mysqli->prepare($query_sql);
+                $query->bind_param("s", $picture_path);   
 
-            $query = $mysqli->prepare($query_sql);
-            $query->bind_param("s", $picture_path);   
+                $query->execute();        
+                $query->close();
 
-            $query->execute();        
-            $query->close();
+                $picture_id = strval($mysqli->insert_id);
 
-            $picture_id = strval($mysqli->insert_id);
+                $query_sql = "  INSERT INTO 
+                                    posts
+                                VALUES 
+                                    (default,?,?,NOW(),?,?)";
 
-            $query_sql = "  INSERT INTO 
-                                posts
-                            VALUES 
-                                (default,?,?,NOW(),?,?)";
+                $query = $mysqli->prepare($query_sql);
+                $query->bind_param("ssss", 
+                    $user_id, 
+                    $post[Posts::PRIVACY_KEY],            
+                    $post[Posts::TEXT_KEY],
+                    $picture_id);  
+            } else {
+                return false;
+            }
 
-            $query = $mysqli->prepare($query_sql);
-            $query->bind_param("ssss", 
-                $user_id, 
-                $post[Posts::PRIVACY_KEY],            
-                $post[Posts::TEXT_KEY],
-                $picture_id);              
 
         } else {
 
@@ -288,7 +428,143 @@ class PostsDB extends Database
         $mysqli->close(); 
 
         return true;
-    }        
+    }      
+
+    static public function likes($post_id)
+    {
+        if (!($mysqli = PostsDB::connect()))
+            return false;
+
+        $query_sql = "  SELECT
+                            CONCAT(user_fname,' ',user_lname), 
+                            users_info.user_id
+                        FROM
+                            likes
+                        INNER JOIN
+                            users_info
+                        ON
+                           likes.user_id = users_info.user_id
+                        WHERE
+                            post_id=?";
+
+        $query = $mysqli->prepare($query_sql);    
+        $query->bind_param("s", $post_id);
+        $query->bind_result(
+            $user_name,
+            $user_id);
+
+        $query->execute();
+
+        $likes = array();
+
+        while($query->fetch()) {
+            $likes[]  = array(
+                Posts::USER_ID_NAME => $user_name,
+                Posts::USER_ID_KEY => $user_id
+            );
+        }
+
+        $query->close();
+        $mysqli->close();
+
+        return $likes;                   
+    }
+
+    static public function like($user_id, $post_id)
+    {
+        if (!($mysqli = PostsDB::connect()))
+            return false;
+     
+        $query_sql = "  INSERT INTO 
+                            likes
+                        VALUES 
+                            (?,?,NOW())
+                        ON 
+                            DUPLICATE KEY 
+                        UPDATE
+                            likes.like_timestamp = NOW()";
+
+        $query = $mysqli->prepare($query_sql);
+        $query->bind_param("ss", 
+            $post_id, 
+            $user_id);
+
+        $query->execute();
+        $query->close();
+
+
+        $query_sql = "  SELECT
+                            user_id,
+                            (
+                                SELECT 
+                                    concat(user_fname, ' ', user_lname)
+                                FROM
+                                    users_info
+                                WHERE
+                                    user_id = ?
+                            )
+                        FROM 
+                            posts
+                        WHERE
+                            post_id = ?";
+
+        $query = $mysqli->prepare($query_sql);
+        $query->bind_param("ss", $user_id, $post_id);
+        $query->bind_result($post_user_id, $like_user_name);
+
+        $query->execute();
+        while($query->fetch()) { }
+        $query->close();
+
+        if ($post_user_id != $user_id) {
+            $query_sql = "  INSERT INTO 
+                                notifications
+                            VALUES 
+                                (?,default,?,NOW(),'0')";
+
+            $notification =  $like_user_name.' liked your post.';
+
+            $query = $mysqli->prepare($query_sql);
+            $query->bind_param("ss", 
+                $post_user_id, 
+                $notification);
+
+            $query->execute();
+            $query->close();        
+
+            PostsDB::pusher()->trigger($post_user_id, 'notification', null);
+        }
+
+        $mysqli->close(); 
+
+        return true;
+    }
+
+    static public function dislike($user_id, $post_id) 
+    {
+        if (!($mysqli = PostsDB::connect()))
+            return false;       
+
+        $query_sql = "  DELETE FROM 
+                            likes
+                        WHERE
+                            post_id = ?
+                        AND
+                            user_id = ?";    
+
+        $query = $mysqli->prepare($query_sql);        
+        $query->bind_param("ss", 
+            $post_id,
+            $user_id); 
+
+        $query->execute();        
+
+        $query->close();
+        $mysqli->close(); 
+
+        return true;
+    }
+
 }
 
 ?>

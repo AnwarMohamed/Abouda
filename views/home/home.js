@@ -51,6 +51,32 @@ angular.module('AboudaApp.home', ['ngRoute'])
             $scope.selectedPostPrivacy = item;
         }
 
+        $scope.like = function(postId, index) {
+            if ($scope.client.homePosts[index]['liked']) {
+
+                $scope.client.dislikePost(postId, 
+                    function(error, result) {
+
+                    if (!error) {
+                        $scope.client.homePosts[index]['liked'] = 0;
+                        $scope.client.homePosts[index]['likes_count'] -= 1;
+                    }
+                });
+
+            } else {
+
+                $scope.client.likePost(postId, 
+                    function(error, result) {
+
+                    if (!error) {
+                        $scope.client.homePosts[index]['liked'] = 1;
+                        $scope.client.homePosts[index]['likes_count'] += 1;
+                    }
+                });
+
+            }
+        }
+
         $scope.post = function() {
             if ($scope.postTextInput.trim().length == 0) {
                 return growl.error('Post content is empty!');
@@ -63,7 +89,7 @@ angular.module('AboudaApp.home', ['ngRoute'])
             $scope.postSpinnerLabel = 'Posting';
             $scope.postSpinner = true;
 
-            RestClient.postMe({
+            $scope.client.postMe({
                 text: $scope.postTextInput,
                 privacy: $scope.selectedPostPrivacy['title'].toLowerCase().trim(),
                 picture: $scope.postPictureInput

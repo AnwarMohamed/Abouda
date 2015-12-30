@@ -60,6 +60,7 @@ angular.module('AboudaApp.signin', ['ngRoute'])
             $scope.signupSpinnerLabel = 'Sign up';
 
             if (!error) {
+                $('#abouda-signup-modal').modal('hide');
                 $location.path('/home');
             }
         });

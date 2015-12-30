@@ -39,7 +39,7 @@ class FriendsDB extends Database
             $query->execute();                         
             $query->close();
 
-            $mysqli->commit();            
+            $mysqli->commit();                 
         }
 
         $mysqli->close();
@@ -193,6 +193,8 @@ class FriendsDB extends Database
 
             $query->execute();                         
             $query->close();
+
+            FriendsDB::pusher()->trigger($friend_id, 'request', null);
         }
 
         $mysqli->close();
