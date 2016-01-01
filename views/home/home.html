@@ -1,7 +1,7 @@
 <div class="container">
     <div class="row">
-        <div class="col-md-3"></div>
-        <div class="col-md-6">        
+        <div class="col-md-3 col-lg-3"></div>
+        <div class="col-md-6 col-lg-6">        
             <form ng-submit="post()">
                 <div class="input-group abouda-post-bar">
                     <input type="text" ng-model="postTextInput" class="form-control abouda-post-text" placeholder="What's on your mind?">                    
@@ -38,9 +38,9 @@
             <div class="abouda-post-bar abouda-posts-container" ng-scrollbars>
                 <div class="row" ng-repeat="post in client.homePosts" >
                     <div class="col-xs-1">
-                        <div class="abouda-post-author-img">
+                        <div>
                             <a href="#/profile/{{post['user_id']}}">
-                                <img ng-src="{{post['user_thumbnail']}}" >
+                                <img class="abouda-post-author-img" ng-src="uploads/{{post['user_thumbnail']}}" >
                             </a>                        
                         </div>
                     </div>
@@ -59,21 +59,21 @@
                             </div>
 
                             <div ng-show="post['picture'] != null">
-                                <img class="abouda-post-picture" ng-src="{{post['picture'] ? 'uploads/' + post['picture'] : null}}">
+                                <img class="abouda-post-picture" ng-src="uploads/{{post['picture']}}">
                             </div>
 
                             <div class="abouda-post-likecomment">
                                 <span>
-                                    <a ng-show="post['likes_count'] != 0" href="#{{location.path()}}" ng-bind="post['likes_count']"></a>
+                                    <a ng-click="likes(post['id'])" ng-show="post['likes_count'] != 0" href="#{{location.path()}}" ng-bind="post['likes_count']"></a>
                                     <span ng-show="post['likes_count'] != 0">&nbsp;</span>
                                     <a href="#{{location.path()}}" ng-click="like(post['id'], $index)" ng-style="{color: post['liked'] ? '#b80000':'#555'}"><i class="fa fa-heart">&nbsp;</i></a>
                                 </span>
-                                <!--
+                                <!--                                
                                 <span>
                                     <a ng-show="post['comments_count'] != 0" href="#{{location.path()}}" ng-bind="post['comments_count']"></a>
                                     <span ng-show="post['comments_count'] != 0">&nbsp;</span>
                                     <a href="#{{location.path()}}"><i class="fa fa-comments-o"></i></a>
-                                </span>
+                                </span>                                
                                 -->
                             </div>
 
@@ -84,5 +84,33 @@
         </div>
         <div class="col-md-3"></div>                  
     </div>
+    <div class="modal fade" id="aboudaPostLikesModal" tabindex="-1" role="dialog" aria-labelledby="aboudaPostLikesModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h3 class="modal-title" id="modal-register-label">People Who Like This</h3>                
+                </div>
+                <div class="modal-body" ng-scrollbars>
+                    <div class="row" ng-repeat="like in client.postLikes">
+                        <div class="col-xs-1">
+                            <div ng-click="profile(like['user_id'])">
+                                <a href="#{{location.path()}}">
+                                    <img class="abouda-post-author-img" ng-src="uploads/{{like['user_thumbnail']}}" >
+                                </a>                        
+                            </div>
+                        </div>
+                        <div class="col-xs-9" style="margin-left: 10px;">                        
+                            <div class="abouda-post-author">
+                                <a ng-href="#{{location.path()}}" ng-click="profile(like['user_id'])">{{like['user_name']}}</a>
+                            </div>                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
 </div>
-

@@ -4,14 +4,58 @@
         <div class="col-md-6">        
             <form ng-submit="search()">
                 <div class="input-group abouda-search-bar">
-                    <input type="text" class="form-control" placeholder="Search for">
-                    <span class="input-group-btn">
-                        <button type="button" class="btn btn-success btn-block ladda-button" data-style="expand-right" ladda="searchSpinner" ng-click="search()">
+                    <input type="text" class="form-control abouda-post-text" ng-model="searchTextInput" placeholder="Search for">
+                    <div class="input-group-btn">
+
+                        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" tabindex = "-1" style="border-radius: 0px !important;">                                
+                            <span><span ng-bind="selectedSearchType['title']"></span></span>
+                            <span class = "caret"></span>
+                        </button>   
+
+                        <ul class = "dropdown-menu">
+                            <li class="dropdown-header">Search Type</li>                            
+                            <li ng-repeat="searchType in searchTypes">
+                                <a href="#{{location.path()}}" ng-click="switchSearchType(searchType)">
+                                    {{searchType['title']}}
+                                </a>
+                            </li>                        
+                        </ul> 
+
+                        <button type="button" class="btn btn-success ladda-button" data-style="expand-right" ladda="searchSpinner" ng-click="search()">
                             <span ng-bind="searchSpinnerLabel" class="ladda-label">Search</span>
                         </button>
-                    </span>
+                    </div>
                 </div>
             </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <div class="abouda-post-bar abouda-posts-container" ng-scrollbars style="background-color: rgba(255, 255, 255, 0.60)">
+                <div class="row" ng-repeat="result in client.searchResults" >                    
+                    <div class="col-xs-1">                            
+                        <a ng-href="#/profile/{{result['user_id']}}">
+                            <img class="abouda-post-author-img" ng-src="uploads/{{result['user_thumbnail']}}" >
+                        </a>                                                    
+                    </div>
+                    <div class="col-xs-9" style="margin-left: 10px;">                        
+                        <div style="line-height: 1; color: black;" class="abouda-post-author">
+                            <a ng-href="#/profile/{{result['user_id']}}" style="color: black;">{{result['user_name']}}</a>
+                        </div>
+
+                        <h5 style="margin-left: 10px; margin-top: 3px;" ng-bind="{{result['email']}}">{{result['email']}}</h5>
+
+                        <h5 style="margin-left: 10px; margin-top: 3px;" ng-bind="{{result['text']}}">{{result['text']}}</h5>
+
+                        <h5 style="margin-left: 10px; margin-top: 3px;" ng-bind="{{result['mobile']}}">{{result['mobile']}}</h5>
+
+                        <h5 style="margin-left: 10px; margin-top: 3px;" ng-bind="{{result['hometown']}}">{{result['hometown']}}</h5>
+
+
+                    </div>                                                                
+                </div>
+            </div>
         </div>
     </div>
 </div>

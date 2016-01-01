@@ -37,7 +37,10 @@ angular.module('AboudaApp.home', ['ngRoute'])
         }];
 
         $scope.selectedPostPrivacy = $scope.postPrivacy[0];
+
         $scope.client.getMyInfo(null);
+        $scope.client.getMyRequests(null);
+        $scope.client.getMyFriends(null);
         $scope.client.getHome(null);
 
         $scope.embedPostOptions = {
@@ -73,7 +76,6 @@ angular.module('AboudaApp.home', ['ngRoute'])
                         $scope.client.homePosts[index]['likes_count'] += 1;
                     }
                 });
-
             }
         }
 
@@ -104,6 +106,18 @@ angular.module('AboudaApp.home', ['ngRoute'])
                     $scope.postPictureInput = null;
                 }
             });
+        }
+
+        $scope.likes = function(postId) {
+            $scope.client.likes(postId, 
+                function(error, result) {
+
+                if (!error) {                    
+                    $('#aboudaPostLikesModal').modal('show');
+                } else {
+                    growl.error('Error fetching post likes');
+                }
+            });            
         }
 
     }

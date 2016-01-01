@@ -1,15 +1,134 @@
 <div class="container">
-<div class="col-md-3">
-	<img id="photo-info-area"/>
-	<div id="info-area">
-		<h3>Anwar Mohamed</h3>
-		<h5 id="email-info-area">anwarelmakrahy@gmail.com</h5>
-		<p>Mobile Security Researcher. Hacker. Exploiter. Public Speaker. Malware Reverser. Speaking Less and Listening More</p>
-		<h5 id="date-info-area"><span class="fa fa-calendar"></span> Joined August 2012</h5>
-		<h5 id="date-info-area"><span class="fa fa-birthday-cake"></span> Born on March 1, 1993</h5>
-	</div>
-</div>
-<div class="col-md-9">
-	
-</div>
+    <div class="row">    
+        <div class="col-md-3"></div>     
+        <div class="col-md-6">
+            <div class="abouda-post-bar abouda-posts-container" style="height: 76vh;max-height: 76vh;" ng-scrollbars>
+                <div class="row" ng-repeat="post in client.profilePosts" >
+                    <div class="col-xs-1">
+                        <div>
+                            <a href="#/profile/{{post['user_id']}}">
+                                <img class="abouda-post-author-img" ng-src="uploads/{{post['user_thumbnail']}}" >
+                            </a>                        
+                        </div>
+                    </div>
+                    <div class="col-xs-11" >
+                        <div class=" abouda-post">                                                    
+                            <div class="abouda-post-author">
+                                <a href="#/profile/{{post['user_id']}}">{{post['user_name']}}</a>
+                                <span class="abouda-post-privacy">&nbsp;
+                                    <i ng-class="!post['public'] ? 'glyphicon glyphicon-lock':'glyphicon glyphicon-globe'"></i>
+                                </span>
+                                <span class="abouda-post-timestamp" am-time-ago="post['timestamp']"></span>
+                            </div>
+                            
+                            <div class="abouda-post-content">
+                                <ng-embed embed-data="post['text']" embed-options="embedPostOptions"></ng-embed>                                
+                            </div>
+
+                            <div ng-show="post['picture'] != null">
+                                <img class="abouda-post-picture" ng-src="uploads/{{post['picture']}}">
+                            </div>
+
+                            <div class="abouda-post-likecomment">
+                                <span>
+                                    <a ng-click="likes(post['id'])" ng-show="post['likes_count'] != 0" href="#{{location.path()}}" ng-bind="post['likes_count']"></a>
+                                    <span ng-show="post['likes_count'] != 0">&nbsp;</span>
+                                    <a href="#{{location.path()}}" ng-click="like(post['id'], $index)" ng-style="{color: post['liked'] ? '#b80000':'#555'}"><i class="fa fa-heart">&nbsp;</i></a>
+                                </span> 
+                                <!--                               
+                                <span>
+                                    <a ng-show="post['comments_count'] != 0" href="#{{location.path()}}" ng-bind="post['comments_count']"></a>
+                                    <span ng-show="post['comments_count'] != 0">&nbsp;</span>
+                                    <a href="#{{location.path()}}"><i class="fa fa-comments-o"></i></a>
+                                </span>                                
+                                -->
+                            </div>
+
+                        </div>                        
+                    </div>
+                </div>                
+            </div>
+        </div>
+        <div class="col-md-3" style="padding: 8px 0px 0px 0px">                 
+            <div class="abouda-post-bar abouda-post" style="height: auto; width: 240px; float: left">
+                <img id="photo-info-area" ng-src="uploads/{{client.profileInfo['thumbnail']}}" />
+                <div id="info-area" style="padding-left: 10px;">
+                    <h3>{{client.profileInfo['fname']}} {{client.profileInfo['lname']}}</h3>                    
+                    <h5 id="email-info-area">{{client.profileInfo['email']}}</h5>                    
+                    
+                    <div ng-show="{{client.profileInfo['about']}}">
+                        <p>{{client.profileInfo['about']}}</p>         
+                    </div>           
+
+                    <div ng-show="{{client.profileInfo['birthdate']}}">
+                        <h5 id="date-info-area"><span class="fa fa-birthday-cake"></span> Born on {{client.profileInfo['birthdate']}}</h5>
+                    </div>
+
+                    <div ng-show="{{client.profileInfo['hometown']}}">
+                        <h5 id="date-info-area"><span class="fa fa-home"></span> Lives in {{client.profileInfo['hometown']}}</h5>
+                    </div>
+            
+                    <h5 id="date-info-area"><span ng-class="client.profileInfo['gender'] ? 'fa fa-male':'fa fa-female'"></span> {{client.profileInfo['gender'] ? 'Male':'Female'}}</h5>                    
+
+                </div>                          
+
+                <div class="input-group" ng-show="isActive('/profile/me')">
+                    <form ng-submit="postProfilePicture()">
+                        <div class="input-group-btn">  
+                            <span class="btn btn-file btn-warning" style="width:175px; border-top-left-radius: 0px; border-top-right-radius: 0px">
+                                <input ng-file-model="profilePictureInput" type="file" accept="image/*">
+                                Change Profile Picture
+                            </span>
+
+                        <button ng-click="postProfilePicture()" type="button" class="btn btn-warning" style="border-radius: 0px !important;">                                
+                           Upload
+                        </button>  
+
+                        </div>
+                    </form>
+                </div>                
+
+                <a ng-click="delete(client.profileInfo['user_id'])" ng-show="client.profileInfo['friendship'] == 'requested'" class="btn btn-warning" style="width: 100%; margin-top: 10px; border-top-left-radius: 0px; border-top-right-radius: 0px">Cancel Request</a>
+                <a ng-click="delete(client.profileInfo['user_id'])" ng-show="client.profileInfo['friendship'] == 'accepted'" class="btn btn-danger" style="width: 100%; margin-top: 10px; border-top-left-radius: 0px; border-top-right-radius: 0px">Remove Friend</a>
+                <a ng-click="add(client.profileInfo['user_id'])" ng-show="(client.profileInfo['friendship'] == 'none') && !client.checkRequest(client.profileInfo['user_id'])" class="btn btn-success" style="width: 100%; margin-top: 10px; border-top-left-radius: 0px; border-top-right-radius: 0px">Add Friend</a>
+
+                <div ng-show="(client.profileInfo['friendship'] == 'none') && client.checkRequest(client.profileInfo['user_id'])" >
+                    <a ng-click="delete(client.profileInfo['user_id'])" class="btn btn-primary" style="width: 50%; margin-top: 10px; border-top-left-radius: 0px; border-top-right-radius: 0px;border-bottom-right-radius: 0px">Decline</a>
+                    <a ng-click="accept(client.profileInfo['user_id'])" class="btn btn-success" style="width: 50%; margin-top: 10px; border-top-left-radius: 0px; border-top-right-radius: 0px;border-bottom-left-radius: 0px; float: right">Accept</a>
+                </div>
+
+            </div>  
+            
+
+        </div>                                    
+    </div>
+    <div class="modal fade" id="aboudaPostLikesModal" tabindex="-1" role="dialog" aria-labelledby="aboudaPostLikesModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h3 class="modal-title" id="modal-register-label">People Who Like This</h3>                
+                </div>
+                <div class="modal-body" ng-scrollbars>
+                    <div class="row" ng-repeat="like in client.postLikes">
+                        <div class="col-xs-1">
+                            <div ng-click="profile(like['user_id'])">
+                                <a href="#{{location.path()}}">
+                                    <img class="abouda-post-author-img" ng-src="uploads/{{like['user_thumbnail']}}" >
+                                </a>                        
+                            </div>
+                        </div>
+                        <div class="col-xs-9" style="margin-left: 10px;">                        
+                            <div class="abouda-post-author">
+                                <a ng-href="#{{location.path()}}" ng-click="profile(like['user_id'])">{{like['user_name']}}</a>
+                            </div>                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>     
 </div>

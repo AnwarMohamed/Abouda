@@ -129,7 +129,7 @@ class Friends
 
         return putJsonBody(array(
             'error' => false,
-            'friends' => $requests           
+            'requests' => $requests           
         ), 200, $response); 
     }
 
@@ -200,6 +200,27 @@ class Friends
         return putJsonBody(array(
             'error' => false,                
             'friends' => $waiting
+        ), 200, $response); 
+    }    
+
+    static public function accept($response, $token, $friend_id)
+    {
+        if (!TokensDB::check($token)) {
+            return putError(
+                'invalid token', 
+                Users::ERROR_AUTH_INVALID, $response);            
+        }
+
+        $accepted = FriendsDB::accept($token[Users::ID_KEY], $friend_id);
+
+        if ($accepted === FALSE) {
+            return putError(
+                'database connection error', 
+                DATABASE::ERROR_DATABASE_CONN, $response);             
+        }
+
+        return putJsonBody(array(
+            'error' => false            
         ), 200, $response); 
     }    
 }

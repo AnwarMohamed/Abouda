@@ -8,6 +8,7 @@ require 'users.php';
 require 'users_info.php';
 require 'posts.php';
 require 'friends.php';
+require 'search.php';
 
 $container = new \Slim\Container();
 $container['notFoundHandler'] = function ($container) {
@@ -140,9 +141,8 @@ $app->put('/user/me/info', function ($request, $response) {
 
 
 /* Handle get my posts */
-$app->get('/user/me/posts', function ($request, $response, $args) {
-    $token = parseToken($request);
-    $friend_id = $args['id'];
+$app->get('/user/me/posts', function ($request, $response) {
+    $token = parseToken($request);    
     return Posts::all($response, $token, null);
 });
 
@@ -205,12 +205,18 @@ $app->delete('/user/{id:[0-9]+}/block', function ($request, $response, $args) {
 });
 
 
+/* Handle accept friend */
+$app->post('/user/{id:[0-9]+}/accept', function ($request, $response, $args) {
+    $token = parseToken($request); 
+    $friend_id = $args['id'];
+    return Friends::accept($response, $token, $friend_id);
+});
+
 
 /* Handle add friend */
 $app->post('/user/{id:[0-9]+}/request', function ($request, $response, $args) {
     $token = parseToken($request); 
     $friend_id = $args['id'];
-
     return Friends::request($response, $token, $friend_id);
 });
 
@@ -253,17 +259,38 @@ $app->get('/user/{id:[0-9]+}/friends', function ($request, $response, $args) {
 
 
 /* Handle like post */
-$app->put('/post/{id}/like', function ($request, $response, $args) {
+$app->put('/post/{id:[0-9]+}/like', function ($request, $response, $args) {
     $token = parseToken($request);
     $post_id = $args['id'];    
     return Posts::like($response, $token, $post_id);
 });
 
 /* Handle dislike post */
-$app->delete('/post/{id}/like', function ($request, $response, $args) {
+$app->delete('/post/{id:[0-9]+}/like', function ($request, $response, $args) {
     $token = parseToken($request);
     $post_id = $args['id'];
     return Posts::dislike($response, $token, $post_id);
+});
+
+/* Handle get post likes */
+$app->get('/post/{id:[0-9]+}/like', function ($request, $response, $args) {
+    $token = parseToken($request);
+    $post_id = $args['id'];    
+    return Posts::likes($response, $token, $post_id);
+});
+
+
+/* Handle search */
+$app->post('/search', function ($request, $response) {
+    $token = parseToken($request);
+    $data = parseJsonBody($request);
+    return Search::get($response, $token, $data['input'], $data['type']);
+});
+
+$app->post('/user/me/picture', function ($request, $response) {
+    $token = parseToken($request);
+    $data = parseJsonBody($request);
+    return UsersInfo::uploadPicture($response, $token, $data);
 });
 
 $app->run();

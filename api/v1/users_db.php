@@ -33,18 +33,51 @@ class UsersDB extends Database
                                 user_fname, 
                                 user_lname, 
                                 user_gender, 
-                                user_birthdate
+                                user_birthdate,
+                                user_thumbnail,
+                                user_picture
                             ) 
                         VALUES 
-                            (?,?,?,?,?)";
+                            (?,?,?,?,?,
+                                (                                                                      
+                                    SELECT 
+                                        picture_id
+                                    FROM 
+                                        pictures
+                                    WHERE
+                                        picture_path
+                                    LIKE 
+                                        ?
+                                    ORDER BY
+                                        picture_id DESC
+                                    LIMIT 1                                
+                                ),
+                                (
+                                    SELECT 
+                                        picture_id
+                                    FROM 
+                                        pictures
+                                    WHERE
+                                        picture_path
+                                    LIKE 
+                                        ?
+                                    ORDER BY
+                                        picture_id DESC
+                                    LIMIT 1                                      
+                                ))";
 
         $query = $mysqli->prepare($query_sql);              
-        $query->bind_param("sssss", 
+
+        $gender_picture = $user[Users::GENDER_KEY] ? "male%": "female%";
+
+        $query->bind_param("sssssss", 
             $user[Users::ID_KEY],
             $user[Users::FNAME_KEY],
             $user[Users::LNAME_KEY],
             $user[Users::GENDER_KEY],
-            $user[Users::BIRTHDATE_KEY]);
+            $user[Users::BIRTHDATE_KEY],
+            $gender_picture,
+            $gender_picture);
 
         $query->execute();
         $query->close();

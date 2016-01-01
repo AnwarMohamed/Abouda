@@ -15,6 +15,7 @@ angular.module('AboudaApp', [
     'toggle-switch',
     'ngSanitize',
     'angular-ladda',
+    'pusher-angular',
     'ngEmbed',
     'ngScrollbars',
     'angularMoment',
@@ -67,11 +68,16 @@ angular.module('AboudaApp', [
 
     this.sessionToken = null;    
     this.myInfo = {};
+    this.profileInfo = {};
 
-    this.homePosts = {};
+    this.searchResults  = [];
+
+    this.homePosts = [];
     this.myPosts = [];
+    this.profilePosts = [];
 
     this.unreadRequests = [];
+    this.myRequests = [];
     this.unreadNotifications = [];
 
 
@@ -107,12 +113,72 @@ angular.module('AboudaApp', [
         $http.post(baseUrl + "user/new", postData)
         .success(function (data, status, headers, config) {        
 
-            var id = data['result']['user_id'];
-            var token = data['result']['token'];
+            if (callback) {
+                callback(false, data);  
+            }
+        })
+        .error(function (data, status, headers, config) {                
+            if (data) {                     
+                growl.error(toTitleCase(data['msg']));
+            }            
 
-            instance.sessionToken = $base64.encode(id + ':' + token);            
-            $cookies.put("session_token", instance.sessionToken);            
-            
+            if (callback) {
+                callback(true, data);       
+            }
+        });   
+    }
+
+    this.addFriend = function(profileId, callback) {
+
+        $http.post(baseUrl + "user/"+ profileId +"/request", null, {
+            headers: { 'Abouda-Token': instance.sessionToken }
+        })
+        .success(function (data, status, headers, config) {        
+
+            if (callback) {
+                callback(false, data);  
+            }
+        })
+        .error(function (data, status, headers, config) {                
+            if (data) {                     
+                growl.error(toTitleCase(data['msg']));
+            }            
+
+            if (callback) {
+                callback(true, data);       
+            }
+        });   
+    }
+
+    this.acceptFriend = function(profileId, callback) {
+
+        $http.post(baseUrl + "user/"+ profileId +"/accept", null, {
+            headers: { 'Abouda-Token': instance.sessionToken }
+        })
+        .success(function (data, status, headers, config) {        
+
+            if (callback) {
+                callback(false, data);  
+            }
+        })
+        .error(function (data, status, headers, config) {                
+            if (data) {                     
+                growl.error(toTitleCase(data['msg']));
+            }            
+
+            if (callback) {
+                callback(true, data);       
+            }
+        });   
+    }
+
+    this.deleteFriend = function(profileId, callback) {
+
+        $http.delete(baseUrl + "user/"+ profileId +"/request", {
+            headers: { 'Abouda-Token': instance.sessionToken }
+        })
+        .success(function (data, status, headers, config) {        
+
             if (callback) {
                 callback(false, data);  
             }
@@ -139,10 +205,38 @@ angular.module('AboudaApp', [
             if (instance.myInfo['gender'])
                 instance.myInfo['gender'] = 'male';
             else
-                instance.myInfo['gender'] = 'female';
+                instance.myInfo['gender'] = 'female';            
 
             if (callback) {
                 callback(false, instance.myInfo); 
+            }
+        })
+        .error(function (data, status, headers, config) {
+            if (data) {                   
+                growl.error(toTitleCase(data['msg']));
+            }            
+
+            if (callback) {
+                callback(true, data);       
+            }
+        });  
+    }
+
+    this.getProfileInfo = function (profileId, callback) {
+
+        $http.get(baseUrl + "user/"+ profileId +"/info", {
+            headers: { 'Abouda-Token': instance.sessionToken }
+        })
+        .success(function (data, status, headers, config) {
+            instance.profileInfo = data['info'];               
+
+            if (instance.profileInfo['gender'])
+                instance.profileInfo['gender'] = 'male';
+            else
+                instance.profileInfo['gender'] = 'female';
+
+            if (callback) {
+                callback(false, instance.profileInfo); 
             }
         })
         .error(function (data, status, headers, config) {
@@ -178,6 +272,29 @@ angular.module('AboudaApp', [
         });   
     }   
 
+    this.postProfilePicture = function(postData, callback) {
+
+        $http.post(baseUrl + "user/me/picture", postData, {
+            headers: { 'Abouda-Token': instance.sessionToken }
+        })
+        .success(function (data, status, headers, config) {        
+
+            if (callback) {
+                callback(false, data);  
+            }
+        })
+        .error(function (data, status, headers, config) {                
+            if (data) {                    
+                growl.error(toTitleCase(data['msg']));
+            }            
+
+            if (callback) {
+                callback(true, data);       
+            }
+        });   
+    }   
+
+
     this.getHome = function(callback) {
 
         $http.get(baseUrl + "post/", {
@@ -185,7 +302,7 @@ angular.module('AboudaApp', [
         })
         .success(function (data, status, headers, config) {        
 
-            instance.homePosts = data['posts'];
+            instance.homePosts = data['posts'];            
 
             if (callback) {
                 callback(false, instance.homePosts);  
@@ -225,6 +342,29 @@ angular.module('AboudaApp', [
         });   
     }   
 
+    this.likes = function (postId, callback) {
+
+        $http.get(baseUrl + "post/" + postId + "/like", {
+            headers: { 'Abouda-Token': instance.sessionToken }
+        })
+        .success(function (data, status, headers, config) {
+            instance.postLikes = data['likes'];               
+
+            if (callback) {
+                callback(false, instance.myInfo); 
+            }
+        })
+        .error(function (data, status, headers, config) {
+            if (data) {                   
+                growl.error(toTitleCase(data['msg']));
+            }            
+
+            if (callback) {
+                callback(true, data);       
+            }
+        });  
+    }
+
     this.dislikePost = function(postId, callback) {
 
         $http.delete(baseUrl + "post/" + postId + "/like", {
@@ -245,7 +385,151 @@ angular.module('AboudaApp', [
                 callback(true, data);       
             }
         });   
-    }             
+    }     
+
+
+    this.getMyPosts = function(callback) {
+
+        $http.get(baseUrl + "user/me/posts", {
+            headers: { 'Abouda-Token': instance.sessionToken }
+        })
+        .success(function (data, status, headers, config) {        
+
+            instance.myPosts = data['posts'];   
+            instance.profilePosts = data['posts'];         
+
+            if (callback) {
+                callback(false, instance.homePosts);  
+            }
+        })
+        .error(function (data, status, headers, config) {
+            
+            if (data) {                
+                growl.error(toTitleCase(data['msg']));
+            }
+
+            if (callback) {
+                callback(true, data);       
+            }
+        });   
+    }     
+
+    this.getProfilePosts = function(profileId, callback) {
+
+        $http.get(baseUrl + "user/"+profileId+"/posts", {
+            headers: { 'Abouda-Token': instance.sessionToken }
+        })
+        .success(function (data, status, headers, config) {        
+            
+            instance.profilePosts = data['posts'];
+
+            if (callback) {
+                callback(false, instance.homePosts);  
+            }
+        })
+        .error(function (data, status, headers, config) {
+            
+            if (data) {                
+                growl.error(toTitleCase(data['msg']));
+            }
+
+            if (callback) {
+                callback(true, data);       
+            }
+        });   
+    } 
+
+    this.getMyFriends = function(callback) {
+
+        $http.get(baseUrl + "user/me/friends", {
+            headers: { 'Abouda-Token': instance.sessionToken }
+        })
+        .success(function (data, status, headers, config) {        
+            
+            instance.myInfo['friends'] = data['friends'];
+
+            if (callback) {
+                callback(false, instance.homePosts);  
+            }
+        })
+        .error(function (data, status, headers, config) {
+            
+            if (data) {                
+                growl.error(toTitleCase(data['msg']));
+            }
+
+            if (callback) {
+                callback(true, data);       
+            }
+        });   
+    }     
+
+    this.checkRequest = function(profileId) {   
+            var i;
+            for (i=0; i<instance.myRequests.length; i++) {
+                if (instance.myRequests[i]['id'] == profileId) {                    
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+    this.getMyRequests = function(callback) {
+
+        $http.get(baseUrl + "/user/me/friends/requests", {
+            headers: { 'Abouda-Token': instance.sessionToken }
+        })
+        .success(function (data, status, headers, config) {        
+            
+            instance.myRequests = data['requests'];
+            instance.unreadRequests = data['requests'];
+
+            if (callback) {
+                callback(false, instance.homePosts);  
+            }
+        })
+        .error(function (data, status, headers, config) {
+            
+            if (data) {                
+                growl.error(toTitleCase(data['msg']));
+            }
+
+            if (callback) {
+                callback(true, data);       
+            }
+        });   
+    } 
+
+    this.search = function(input, type, callback) {
+        
+        $http.post(baseUrl + "search", {
+            input: input,
+            type: type
+        },
+        {
+            headers: { 'Abouda-Token': instance.sessionToken }
+        })
+        .success(function (data, status, headers, config) {        
+            
+            instance.searchResults = data['results'];            
+
+            if (callback) {
+                callback(false, instance.homePosts);  
+            }
+        })
+        .error(function (data, status, headers, config) {
+            
+            if (data) {                
+                growl.error(toTitleCase(data['msg']));
+            }
+
+            if (callback) {
+                callback(true, data);       
+            }
+        });   
+    }  
+
 }])
 
 .controller("MainCtrl", 
@@ -284,6 +568,10 @@ $("body").vegas({
     }, {
         src: "/abouda/img/back8.jpg"
     }, {
+        src: "/abouda/img/back10.jpg"        
+    }, {
+        src: "/abouda/img/back11.jpg"        
+    }, {
         src: "/abouda/img/back9.jpg"
     }]
 });
@@ -300,3 +588,4 @@ $(".jaybar-menu-item")
     });
 
 $('[data-toggle="tooltip"]').tooltip();
+$("[data-dismiss=modal]").trigger({ type: "click" });

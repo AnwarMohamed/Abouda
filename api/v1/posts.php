@@ -200,6 +200,28 @@ class Posts
             'error' => false,                            
         ), 200, $response);   
     }    
+
+    static public function likes($response, $token, $post_id) 
+    {
+        if (!TokensDB::check($token)) {
+            return putError(
+                'invalid token', 
+                Users::ERROR_AUTH_INVALID, $response);            
+        }   
+        
+        $likes = PostsDB::likes($post_id);
+
+        if ($likes === FALSE) {
+            return putError(
+                'database connection error', 
+                DATABASE::ERROR_DATABASE_CONN, $response);             
+        }
+
+        return putJsonBody(array(
+            'error' => false,
+            'likes' => $likes                            
+        ), 200, $response);   
+    }      
 }
 
 ?>

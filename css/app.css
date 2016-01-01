@@ -92,7 +92,7 @@ p {
 
 .abouda-post-bar,
 .abouda-search-bar {
-    border-radius: 5px;
+    border-radius: 3px;
     background-color: rgba(255, 255, 255, 0.35);
     padding: 10px;
     position: relative;
@@ -151,7 +151,7 @@ p {
 
 #email-info-area {
     margin-top: 0px;
-    color: gray;
+    color: #444;
 }
 
 #date-info-area {
@@ -160,16 +160,19 @@ p {
     font-family: "Helvetica Neue";
 }
 
-#photo-info-area {
-    border-radius: 5px;
-    border-image-width: 1;
-    background-color: white;
-    border: 5px solid white;
-    width: 200px;
-    height: 200px;
+#photo-info-area {        
+    max-width: 240px;
+    max-height: 240px;
+    width: 100%;
+    /*height: auto;  */
+    margin-left: auto;
+    margin-right: auto;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
 }
 
-#abouda-signup-modal .modal-header {
+#aboudaMyFriendsModal .modal-header,
+#aboudaSignupModal .modal-header {
     background-color: #337ab7;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
@@ -178,11 +181,11 @@ p {
     color: white;
 }
 
-#abouda-signup-modal .modal-header > h3 {
+#aboudaSignupModal .modal-header > h3 {
     font-size: 20px;
     font-weight: bold;
 }
-
+/*
 .modal.fade .modal-dialog {
     -webkit-transform: scale(0.1);
     -moz-transform: scale(0.1);
@@ -216,7 +219,7 @@ p {
     height: 100%;
     vertical-align: middle;
     margin-right: -4px;
-    /* Adjusts for spacing */
+  
 }
 
 .modal-dialog {
@@ -224,6 +227,7 @@ p {
     text-align: left;
     vertical-align: middle;
 }
+*/
 
 .jaybar,
 .jaybar * {
@@ -506,7 +510,7 @@ p {
     list-style: none;
     width: 200px;
     visibility: hidden;
-    height: 0
+    height: 0;
 }
 
 .jaybar-menu a {
@@ -518,32 +522,39 @@ p {
     padding: 15px 10px;
     border-bottom: 1px solid #000;
     text-align: center;
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.35);
     opacity: 0;
     visibility: hidden;
     -webkit-transition: all 0.2s ease;
     transition: all 0.2s ease;
     -webkit-transform: translateY(100px) translateZ(0);
-    transform: translateY(100px) translateZ(0)
+    transform: translateY(100px) translateZ(0);    
 }
 
 .jaybar-menu li:last-child {
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px
 }
 
 .jaybar-menu li:nth-child(odd) {
-    background: rgba(17, 17, 17, 0.5);
+    background: rgba(255, 255, 255, 0.70);
 }
 
 .jaybar-menu li:nth-child(even) {
-    background: rgba(50, 50, 50, 0.5);
+    background: rgba(255, 255, 255, 0.70);
 }
 
 .jaybar-menu li:hover {
     background: #2b2b2b;
     padding-left: 20px
 }
+
+
+.jaybar-menu li h3,
+.jaybar-menu li p {
+    color: #333;
+}
+
 
 .jaybar-menu li:hover h3,
 .jaybar-menu li:hover p {
@@ -675,11 +686,13 @@ p {
 }
 
 .abouda-post-author-img {
-    width: 40px;
-    height: 40px;
-    border-radius: 2px;
-    border: 1px solid gray;
+    max-width: 40px;
+    max-height: 40px;
+    border-radius: 3px;
+    /*border: 1px solid white;*/
     vertical-align: middle;
+    height: auto;
+    width: auto;
     margin-right: 10px;
     margin-bottom: 10px;
 }
@@ -711,4 +724,18 @@ p {
     background: red;
     cursor: inherit;
     display: block;
+}
+
+#aboudaPostLikesModal .modal-header {
+    background-color: #337ab7;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    padding: 8px 10px 8px 10px;
+    font-family: 'Cabin';
+    color: white;
+}
+
+#aboudaPostLikesModal .modal-header > h3 {
+    font-size: 14px;
+    font-weight: bold;
 }

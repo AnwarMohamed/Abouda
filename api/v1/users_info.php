@@ -35,6 +35,27 @@ class UsersInfo
         ), 200, $response);   
 	}
 
+    static public function uploadPicture($response, $token, $data)
+    {
+        if (!TokensDB::check($token)) {
+            return putError(
+                'invalid token', 
+                Users::ERROR_AUTH_INVALID, $response);            
+        }
+
+        $picture = UsersInfoDB::uploadPicture($token[Users::ID_KEY], $data);
+
+        if ($picture === FALSE) {
+            return putError(
+                'database connection error', 
+                DATABASE::ERROR_DATABASE_CONN, $response);             
+        }
+
+        return putJsonBody(array(
+            'error' => false
+        ), 200, $response);
+    }
+
 	static public function update($response, $token, $info)
 	{
         if (!TokensDB::check($token)) {

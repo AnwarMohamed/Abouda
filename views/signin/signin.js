@@ -17,15 +17,27 @@ angular.module('AboudaApp.signin', ['ngRoute'])
         return $location.path('/home');
     }
 
+    $scope.client = RestClient;
     $scope.signupSpinnerLabel = 'Sign up';
     $scope.signinSpinnerLabel = 'Sign in';
 
+    $scope.verifyEmail = function(email) {        
+        var emailRegEx = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i; 
+        return email.match(emailRegEx);        
+    }
+
     $scope.signin = function() {
+        
+        if (!$scope.verifyEmail($scope.signinEmail)) {
+            return growl.error('Invalid or empty email');
+        } else if ($scope.signinPassword.trim().length == 0) {
+            return growl.error('Invalid or empty password');
+        }
 
         $scope.signinSpinner = true;
         $scope.signinSpinnerLabel = 'Signing in';
 
-        RestClient.signinMe(
+        $scope.client.signinMe(
             $scope.signinEmail, $scope.signinPassword, 
             function (error, result) {
 
@@ -38,7 +50,7 @@ angular.module('AboudaApp.signin', ['ngRoute'])
         });
     };
 
-    $scope.signup = function() { 
+    $scope.signup = function(modal) { 
 
         var data = { 
             fname: $scope.signupFname,
@@ -48,20 +60,20 @@ angular.module('AboudaApp.signin', ['ngRoute'])
             birthdate: $('#signupBirthdate').data('date'),
             email: $scope.signupEmail, 
             password: $scope.signupPassword 
-        };        
+        };                
 
         $scope.signupSpinner = true;
         $scope.signupSpinnerLabel = 'Signing up';
 
-        RestClient.signupMe(data, 
+        $scope.client.signupMe(data, 
             function (error, result) {
             
             $scope.signupSpinner = false;     
             $scope.signupSpinnerLabel = 'Sign up';
 
             if (!error) {
-                $('#abouda-signup-modal').modal('hide');
-                $location.path('/home');
+                $('#aboudaSignupModal').modal('hide');
+                growl.success('Sign up completed! Sign in now');
             }
         });
     };  

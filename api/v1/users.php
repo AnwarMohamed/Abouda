@@ -14,6 +14,8 @@ class Users
     const MOBILE_KEY = 'mobile';
     const MARITAL_KEY = 'marital';
     const ABOUT_KEY = 'about';
+    const FRIENDSHIP_KEY = 'friendship';
+    const THUMBNAIL_KEY = 'thumbnail';
 
     const ID_KEY = 'user_id';
     const TOKEN_KEY = 'token';

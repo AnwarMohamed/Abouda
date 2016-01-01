@@ -24,7 +24,10 @@
     "moment": "~2.10.6",
     "angular-moment": "~0.10.3",
     "ngEmbed": "ng-embed#~2.0.3",
-    "angular-highlightjs": "~0.5.1"
+    "angular-highlightjs": "~0.5.1",
+    "pusher-angular": "~0.1.8",
+    "pusher": "~3.0.0",
+    "bootstrap-modal": "~2.2.6"
   },
   "resolutions": {
     "angular": "1.4.8"

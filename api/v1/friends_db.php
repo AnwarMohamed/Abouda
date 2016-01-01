@@ -137,16 +137,24 @@ class FriendsDB extends Database
             $query_sql = "  DELETE FROM
                                 friendships
                             WHERE
+                            (    
                                 user_id = ?
                             AND
                                 friend_id = ?
+                            )
+                            OR 
+                            (    
+                                user_id = ?
                             AND
-                                friendship_type = 'requested'";
+                                friend_id = ?
+                            )";
 
             $query = $mysqli->prepare($query_sql);                  
-            $query->bind_param("ss",                 
+            $query->bind_param("ssss",                 
                 $user_id,
-                $friend_id); 
+                $friend_id,                
+                $friend_id,
+                $user_id); 
 
             $query->execute();                         
             $query->close();
@@ -168,7 +176,7 @@ class FriendsDB extends Database
                             SELECT
                                 ?,?,'requested',NOW()
                             FROM
-                                friendships
+                                users
                             WHERE
                                 ?
                             NOT IN 
@@ -181,10 +189,11 @@ class FriendsDB extends Database
                                     user_id = ?
                                 AND
                                     friend_id = ?
-                            )";                            
+                            )
+                            LIMIT 1";                            
 
             $query = $mysqli->prepare($query_sql);
-            $query->bind_param("sss",
+            $query->bind_param("sssss",
                 $user_id,
                 $friend_id,
                 $friend_id,
@@ -194,7 +203,7 @@ class FriendsDB extends Database
             $query->execute();                         
             $query->close();
 
-            FriendsDB::pusher()->trigger($friend_id, 'request', null);
+            //FriendsDB::pusher()->trigger($friend_id, 'request', null);
         }
 
         $mysqli->close();
@@ -370,7 +379,7 @@ class FriendsDB extends Database
                                 friendship_type = 'accepted'";
 
             $query = $mysqli->prepare($query_sql);
-            var_dump($mysqli->error);
+            //var_dump($mysqli->error);
             $query->bind_param("ss", 
                 $user_id,
                 $friend_id);  
@@ -400,6 +409,72 @@ class FriendsDB extends Database
 
         return $friends;   
     }
+
+    static public function accept($user_id, $friend_id)
+    {
+        if (!($mysqli = FriendsDB::connect()))
+            return false;
+
+        if ($user_id != $friend_id) {            
+            $query_sql = "  INSERT INTO
+                                friendships
+                            SELECT
+                                ?,?,'accepted',NOW()
+                            FROM
+                                users
+                            WHERE
+                                ?
+                            IN 
+                            (
+                                SELECT 
+                                    user_id
+                                FROM
+                                    friendships
+                                WHERE
+                                    user_id = ?
+                                AND
+                                    friend_id = ?
+                                AND
+                                    friendship_type = 'requested'
+                            )
+                            LIMIT 1";                            
+
+            $query = $mysqli->prepare($query_sql);
+            $query->bind_param("sssss",                
+                $user_id,
+                $friend_id,                
+                $friend_id,                
+                $friend_id,
+                $user_id); 
+
+            $query->execute();                         
+            $query->close();
+
+            $query_sql = "  UPDATE
+                                friendships
+                            SET
+                                friendship_type = 'accepted',
+                                friendship_timestamp = NOW()                                
+                            WHERE
+                                user_id = ?
+                            AND
+                                friend_id = ?";                            
+
+            $query = $mysqli->prepare($query_sql);
+            $query->bind_param("ss",              
+                $friend_id,
+                $user_id); 
+
+            $query->execute();                         
+            $query->close();
+
+            //FriendsDB::pusher()->trigger($friend_id, 'request', null);
+        }
+
+        $mysqli->close();
+
+        return true;
+    } 
 
 }
 
